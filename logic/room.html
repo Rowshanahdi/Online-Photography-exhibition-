@@ -13,165 +13,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <!-- Font Awesome 6 (free) for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    /* custom overrides to match the palette exactly */
-    :root {
-      --steel-teal: #578088;
-      --dolphin-gray: #74948c;
-      --light-beige: #cfb580;
-      --milk-chocolate: #864e3e;
-      --copper-red: #ca7c4c;
-    }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #f7f4ef;
-      color: #2a3a3d;
-    }
-    h1, h2, h3, h4, .heading-font {
-      font-family: 'Georgia', serif;
-      letter-spacing: 0.02em;
-    }
-    /* small UI text (Roboto) */
-    .ui-small {
-      font-family: 'Roboto', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 400;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--dolphin-gray);
-    }
-    /* custom daisyUI button override with copper red */
-    .btn-copper {
-      background: var(--copper-red);
-      border: none;
-      color: white;
-    }
-    .btn-copper:hover {
-      background: var(--milk-chocolate);
-    }
-    .btn-outline-steel {
-      background: transparent;
-      border: 2px solid var(--steel-teal);
-      color: var(--steel-teal);
-    }
-    .btn-outline-steel:hover {
-      background: var(--steel-teal);
-      color: white;
-    }
-    /* filter tabs style */
-    .filter-tab {
-      font-family: 'Roboto', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 400;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--dolphin-gray);
-      cursor: pointer;
-      padding: 6px 0;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-      background: none;
-      border-top: none;
-      border-left: none;
-      border-right: none;
-    }
-    .filter-tab:hover { color: var(--steel-teal); }
-    .filter-tab.active {
-      color: var(--copper-red);
-      border-bottom-color: var(--copper-red);
-      font-weight: 500;
-    }
-    /* card hover & transition */
-    .exhibition-card {
-      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-      cursor: pointer;
-      border: 1px solid rgba(207, 181, 128, 0.25);
-    }
-    .exhibition-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 40px rgba(87, 128, 136, 0.12);
-      border-color: var(--light-beige);
-    }
-    .card-img {
-      height: 200px;
-      background-size: cover;
-      background-position: center;
-      transition: transform 0.4s ease;
-    }
-    .exhibition-card:hover .card-img {
-      transform: scale(1.02);
-    }
-    .category-badge {
-      background: rgba(44, 58, 60, 0.75);
-      backdrop-filter: blur(2px);
-      color: white;
-      font-family: 'Roboto', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 400;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 4px 14px;
-      border-radius: 30px;
-    }
-    /* lightbox modal override for daisyUI */
-    .modal-box {
-      max-width: 700px;
-      padding: 0;
-      overflow: hidden;
-      border-radius: 16px;
-      background: white;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-    }
-    .modal-box .lightbox-img {
-      height: 320px;
-      background-size: cover;
-      background-position: center;
-      background-color: #b7afa0;
-    }
-    .modal-box .lightbox-body {
-      padding: 28px 32px 32px;
-    }
-    .modal-box .lightbox-body h3 {
-      font-family: 'Georgia', serif;
-      font-size: 2rem;
-      color: var(--steel-teal);
-      margin-bottom: 2px;
-    }
-    .modal-box .lightbox-body .artist {
-      font-family: 'Roboto', sans-serif;
-      font-weight: 300;
-      font-size: 1.1rem;
-      color: var(--dolphin-gray);
-      margin-bottom: 10px;
-    }
-    .modal-box .lightbox-body .description {
-      font-family: 'Roboto', sans-serif;
-      font-weight: 300;
-      font-size: 1rem;
-      color: #3d4f52;
-      margin: 16px 0 20px;
-      line-height: 1.6;
-    }
-    .modal-box .lightbox-body .meta-grid {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      border-top: 1px solid #e6e2d8;
-      padding-top: 16px;
-      margin-top: 6px;
-    }
-    .modal-box .lightbox-body .meta-grid span {
-      font-family: 'Roboto', sans-serif;
-      font-size: 0.8rem;
-      color: var(--dolphin-gray);
-    }
-    .modal-box .lightbox-body .meta-grid strong {
-      color: var(--dark-text);
-      font-weight: 500;
-    }
-  </style>
 </head>
-<body>
+<body class="font-['Roboto'] bg-[#f7f4ef] text-[#2a3a3d]">
 
   <!-- MAIN CONTAINER (no header / footer) -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
@@ -183,14 +26,14 @@
         <div class="text-sm font-light tracking-[0.25em] text-[#864e3e] uppercase mb-2 flex items-center justify-center gap-2">
           <i class="fas fa-camera text-[#ca7c4c]"></i> Curated Vision
         </div>
-        <h2 class="text-4xl sm:text-5xl md:text-6xl font-normal text-[#578088] leading-tight">
+        <h2 class="font-['Georgia'] text-4xl sm:text-5xl md:text-6xl font-normal text-[#578088] leading-tight">
           Where <span class="text-[#ca7c4c]">Copper</span> Meets <span class="text-[#578088]">Steel</span>
         </h2>
         <p class="text-base sm:text-lg text-[#3d4f52] max-w-xl mx-auto mt-3 font-light">
           An immersive exhibition of contemporary photography — texture, memory, and the interplay of natural &amp; industrial palettes.
         </p>
         <div class="flex flex-wrap justify-center gap-3 mt-6">
-          <button class="btn btn-copper text-white px-6 py-2.5 rounded-full text-sm font-medium shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+          <button class="btn bg-[#ca7c4c] hover:bg-[#864e3e] text-white border-0 px-6 py-2.5 rounded-full text-sm font-medium shadow-md hover:shadow-lg transition-all flex items-center gap-2">
             <i class="fas fa-compass"></i> Explore Gallery
           </button>
           <button class="btn bg-transparent border-2 border-white/70 text-white hover:bg-white hover:text-[#578088] px-6 py-2.5 rounded-full text-sm font-medium transition-all">
@@ -202,12 +45,12 @@
 
     <!-- FILTER / CATEGORY TABS (Roboto small UI) -->
     <div class="flex flex-wrap justify-center gap-2 sm:gap-4 border-b border-[#cfb580]/30 pb-4 mb-6" id="filterTabs">
-      <button class="filter-tab active" data-filter="all">All</button>
-      <button class="filter-tab" data-filter="Abstract">Abstract</button>
-      <button class="filter-tab" data-filter="Urban">Urban</button>
-      <button class="filter-tab" data-filter="Nature">Nature</button>
-      <button class="filter-tab" data-filter="Portrait">Portrait</button>
-      <button class="filter-tab" data-filter="Architecture">Architecture</button>
+      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors active-tab" data-filter="all" style="border-bottom-color: #ca7c4c; color: #ca7c4c; font-weight: 500;">All</button>
+      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Abstract">Abstract</button>
+      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Urban">Urban</button>
+      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Nature">Nature</button>
+      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Portrait">Portrait</button>
+      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Architecture">Architecture</button>
     </div>
 
     <!-- GALLERY GRID -->
@@ -223,15 +66,15 @@
       <label for="lightboxModal" class="btn btn-sm btn-circle absolute right-4 top-4 z-20 bg-black/30 text-white border-0 hover:bg-[#ca7c4c] transition-all">
         <i class="fas fa-times"></i>
       </label>
-      <div class="lightbox-img" id="lightboxImg" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=400&fit=crop&crop=center');"></div>
-      <div class="lightbox-body">
-        <h3 id="lightboxTitle">Title</h3>
-        <div class="artist" id="lightboxArtist">Artist</div>
-        <div class="description" id="lightboxDesc">Description of the work.</div>
-        <div class="meta-grid">
-          <span><strong>Category:</strong> <span id="lightboxCategory">Abstract</span></span>
-          <span><strong>Year:</strong> <span id="lightboxYear">2024</span></span>
-          <span><strong>Medium:</strong> <span id="lightboxMedium">Digital</span></span>
+      <div class="h-80 bg-cover bg-center bg-[#b7afa0]" id="lightboxImg" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=400&fit=crop&crop=center');"></div>
+      <div class="p-7 sm:p-8">
+        <h3 class="font-['Georgia'] text-3xl font-normal text-[#578088] mb-0.5" id="lightboxTitle">Title</h3>
+        <div class="font-['Roboto'] font-light text-lg text-[#74948c] mb-2.5" id="lightboxArtist">Artist</div>
+        <p class="font-['Roboto'] font-light text-base text-[#3d4f52] my-4 leading-relaxed" id="lightboxDesc">Description of the work.</p>
+        <div class="flex flex-wrap gap-5 border-t border-[#e6e2d8] pt-4 mt-1.5">
+          <span class="font-['Roboto'] text-sm text-[#74948c]"><strong class="text-[#2a3a3d] font-medium">Category:</strong> <span id="lightboxCategory">Abstract</span></span>
+          <span class="font-['Roboto'] text-sm text-[#74948c]"><strong class="text-[#2a3a3d] font-medium">Year:</strong> <span id="lightboxYear">2024</span></span>
+          <span class="font-['Roboto'] text-sm text-[#74948c]"><strong class="text-[#2a3a3d] font-medium">Medium:</strong> <span id="lightboxMedium">Digital</span></span>
         </div>
       </div>
     </div>
@@ -265,7 +108,7 @@
 
     // ----- DOM refs -----
     const grid = document.getElementById('galleryGrid');
-    const filterTabs = document.querySelectorAll('.filter-tab');
+    const filterTabs = document.querySelectorAll('#filterTabs button');
     const modalCheckbox = document.getElementById('lightboxModal');
     const lightboxImg = document.getElementById('lightboxImg');
     const lightboxTitle = document.getElementById('lightboxTitle');
@@ -275,21 +118,19 @@
     const lightboxYear = document.getElementById('lightboxYear');
     const lightboxMedium = document.getElementById('lightboxMedium');
 
-    let currentFilter = 'all';
-
     // ----- render function -----
     function renderGallery(filter) {
       const filtered = filter === 'all' ? exhibitions : exhibitions.filter(ex => ex.category === filter);
       grid.innerHTML = filtered.map(ex => `
-        <div class="exhibition-card bg-white rounded-xl overflow-hidden shadow-sm" data-id="${ex.id}" data-category="${ex.category}">
-          <div class="card-img relative" style="background-image: url('${ex.img}');">
-            <span class="category-badge absolute bottom-3 left-3">${ex.category}</span>
+        <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-[#cfb580]/25 hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 cursor-pointer" data-id="${ex.id}" data-category="${ex.category}">
+          <div class="h-52 bg-cover bg-center transition-transform duration-300 hover:scale-105 relative" style="background-image: url('${ex.img}');">
+            <span class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white font-['Roboto'] text-[0.65rem] font-normal tracking-widest uppercase px-3.5 py-1 rounded-full">${ex.category}</span>
           </div>
           <div class="p-4 sm:p-5">
-            <h3 class="text-xl font-normal text-[#2a3a3d]">${ex.title}</h3>
-            <div class="text-sm font-light text-[#74948c]">${ex.artist}</div>
+            <h3 class="font-['Georgia'] text-xl font-normal text-[#2a3a3d]">${ex.title}</h3>
+            <div class="font-['Roboto'] text-sm font-light text-[#74948c]">${ex.artist}</div>
             <div class="flex items-center justify-between mt-3 pt-3 border-t border-[#cfb580]/30">
-              <span class="ui-small text-[#864e3e]">${ex.year} · ${ex.medium}</span>
+              <span class="font-['Roboto'] text-[0.7rem] font-normal tracking-wide uppercase text-[#864e3e]">${ex.year} · ${ex.medium}</span>
               <i class="fas fa-arrow-right text-[#ca7c4c] opacity-70 transition-opacity"></i>
             </div>
           </div>
@@ -297,7 +138,7 @@
       `).join('');
 
       // attach click listeners to cards -> open modal
-      document.querySelectorAll('.exhibition-card').forEach(card => {
+      document.querySelectorAll('#galleryGrid > div').forEach(card => {
         card.addEventListener('click', function() {
           const id = parseInt(this.dataset.id);
           const ex = exhibitions.find(e => e.id === id);
@@ -321,10 +162,13 @@
     // ----- filter logic -----
     filterTabs.forEach(tab => {
       tab.addEventListener('click', function() {
-        filterTabs.forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
+        filterTabs.forEach(t => {
+          t.classList.remove('border-[#ca7c4c]', 'text-[#ca7c4c]', 'font-medium');
+          t.classList.add('border-transparent', 'text-[#74948c]', 'font-normal');
+        });
+        this.classList.remove('border-transparent', 'text-[#74948c]', 'font-normal');
+        this.classList.add('border-[#ca7c4c]', 'text-[#ca7c4c]', 'font-medium');
         const filter = this.dataset.filter;
-        currentFilter = filter;
         renderGallery(filter);
       });
     });
