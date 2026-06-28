@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FraVi · Admin Dashboard</title>
+
+  <!-- Tailwind + DaisyUI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.css" rel="stylesheet" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-main: #1a1418;
+      --bg-header: #0f0c09;
+      --bg-card: #110e0b;
+      --border: #3b2f2f;
+      --text-main: #e8dcc5;
+      --text-heading: #f5e6c8;
+      --accent: #c8a97e;
+      --text-secondary: #a8866a;
+      --text-small: #6b5846;
+    }
+    * {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .heading-font {
+      font-family: 'Playfair Display', serif;
+    }
+    body {
+      background: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    .admin-nav {
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .admin-nav-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--text-heading);
+      letter-spacing: .05em;
+    }
+    .admin-nav-brand span {
+      color: var(--accent);
+    }
+    .admin-nav-brand small {
+      font-size: 0.65rem;
+      color: var(--text-small);
+      font-family: 'Inter', sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-left: 8px;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 3px;
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px;
+      flex-wrap: wrap;
+    }
+    .admin-tab {
+      font-size: 11px;
+      padding: 5px 14px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background .15s, color .15s;
+      white-space: nowrap;
+    }
+    .admin-tab.active {
+      background: var(--bg-card);
+      color: var(--text-heading);
+      border: 1px solid var(--border);
+    }
+    .admin-tab:hover:not(.active) {
+      color: var(--text-heading);
+    }
+    .admin-tab .badge {
+      background: var(--accent);
+      color: #0f0c09;
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      margin-left: 4px;
+      font-weight: 600;
+    }
+    .admin-tab .badge.danger {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+    }
+    .stat-card .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--accent);
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      color: var(--text-small);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .content-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .content-card:hover {
+      border-color: var(--accent);
+    }
+    .content-card .card-header {
+      padding: 0.8rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .content-card .card-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--text-heading);
+    }
+    .content-card .card-body {
+      padding: 0.8rem 1.2rem;
+    }
+    .content-card .card-body .row-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(59, 47, 47, 0.3);
+    }
+    .content-card .card-body .row-item:last-child {
+      border-bottom: none;
+    }
+    .content-card .card-body .row-item .item-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .content-card .card-body .row-item .item-info .thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: #0a0806;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .content-card .card-body .row-item .item-info .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .content-card .card-body .row-item .item-info .name {
+      font-size: 13px;
+      color: var(--text-main);
+    }
+    .content-card .card-body .row-item .item-info .sub {
+      font-size: 11px;
+      color: var(--text-small);
+    }
+    .content-card .card-body .row-item .item-status {
+      font-size: 11px;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .status-live {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+    .status-pending {
+      background: rgba(200, 169, 126, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(200, 169, 126, 0.2);
+    }
+    .status-approved {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+    .status-rejected {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .status-ended {
+      background: rgba(107, 88, 70, 0.2);
+      color: var(--text-small);
+      border: 1px solid rgba(107, 88, 70, 0.2);
+    }
+    .status-sold {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .status-active {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+    .status-inactive {
+      background: rgba(107, 88, 70, 0.2);
+      color: var(--text-small);
+      border: 1px solid rgba(107, 88, 70, 0.2);
+    }
+
+    .action-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: var(--text-heading);
+    }
+    .action-btn.danger:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+    .action-btn.success:hover {
+      border-color: #22c55e;
+      color: #22c55e;
+    }
+    .action-btn.warning:hover {
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+
+    .modal-box {
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text-main) !important;
+    }
+    .modal-box input,
+    .modal-box textarea,
+    .modal-box select {
+      background: #0a0806;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 6px;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      outline: none;
+    }
+    .modal-box input:focus,
+    .modal-box textarea:focus,
+    .modal-box select:focus {
+      border-color: var(--accent);
+    }
+    .modal-box label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      display: block;
+      margin-bottom: 3px;
+      margin-top: 12px;
+    }
+    .modal-box label:first-of-type {
+      margin-top: 0;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 200;
+      background: var(--bg-card);
+      border: 1px solid var(--accent);
+      color: var(--text-main);
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, .6);
+      max-width: 90%;
+    }
+    .toast.show {
+      display: block;
+      animation: fadeup .22s ease;
+    }
+    @keyframes fadeup {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .admin-wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .admin-table th {
+      color: var(--text-small);
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .admin-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(59, 47, 47, 0.3);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+    .admin-table .thumb-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #0a0806;
+    }
+    .admin-table .thumb-sm img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .community-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .community-item {
+      background: #0a0806;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .community-item:hover {
+      border-color: var(--accent);
+    }
+    .community-item img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+    .community-item .info {
+      padding: 8px 10px;
+    }
+    .community-item .info .title {
+      font-size: 12px;
+      color: var(--text-heading);
+      font-weight: 500;
+    }
+    .community-item .info .artist {
+      font-size: 10px;
+      color: var(--text-small);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ================= ADMIN NAV ================= -->
+  <nav class="admin-nav">
+    <div class="admin-nav-brand">
+      FraVi <span>·</span> Admin
+      <small>Dashboard</small>
+    </div>
+    <div class="admin-tabs" id="adminTabs">
+      <button class="admin-tab active" data-tab="dashboard" onclick="switchTab('dashboard')">
+        <i class="fas fa-chart-pie"></i> Overview
+      </button>
+      <button class="admin-tab" data-tab="auctions" onclick="switchTab('auctions')">
+        <i class="fas fa-gavel"></i> Auctions
+        <span class="badge" id="auctionBadge">0</span>
+      </button>
+      <button class="admin-tab" data-tab="submissions" onclick="switchTab('submissions')">
+        <i class="fas fa-upload"></i> Submissions
+        <span class="badge danger" id="submissionBadge">0</span>
+      </button>
+      <button class="admin-tab" data-tab="community" onclick="switchTab('community')">
+        <i class="fas fa-images"></i> Community
+        <span class="badge" id="communityBadge">0</span>
+      </button>
+      <button class="admin-tab" data-tab="users" onclick="switchTab('users')">
+        <i class="fas fa-users"></i> Users
+        <span class="badge" id="userBadge">0</span>
+      </button>
+      <button class="admin-tab" data-tab="bids" onclick="switchTab('bids')">
+        <i class="fas fa-hand-holding-heart"></i> Bids
+        <span class="badge" id="bidBadge">0</span>
+      </button>
+    </div>
+    <div>
+      <button onclick="document.getElementById('addAuctionModal').showModal()" class="action-btn success" style="border-color:#22c55e;color:#22c55e;">
+        <i class="fas fa-plus"></i> New Auction
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <div class="admin-wrap">
+
+    <!-- ===== DASHBOARD TAB ===== -->
+    <div class="tab-content active" id="tab-dashboard">
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="statAuctions">0</div>
+          <div class="stat-label">Active Auctions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statSubmissions">0</div>
+          <div class="stat-label">Pending Submissions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statCommunity">0</div>
+          <div class="stat-label">Community Photos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statUsers">0</div>
+          <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statBids">0</div>
+          <div class="stat-label">Total Bids</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statRevenue">$0</div>
+          <div class="stat-label">Total Revenue</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="content-card">
+          <div class="card-header">
+            <h3>Recent Auctions</h3>
+            <button class="action-btn" onclick="switchTab('auctions')">View All</button>
+          </div>
+          <div class="card-body" id="recentAuctions"></div>
+        </div>
+        <div class="content-card">
+          <div class="card-header">
+            <h3>Pending Submissions</h3>
+            <button class="action-btn" onclick="switchTab('submissions')">View All</button>
+          </div>
+          <div class="card-body" id="recentSubmissions"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== AUCTIONS TAB ===== -->
+    <div class="tab-content" id="tab-auctions">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="heading-font text-2xl text-[#f5e6c8]">Manage Auctions</h2>
+        <button onclick="document.getElementById('addAuctionModal').showModal()" class="action-btn success" style="border-color:#22c55e;color:#22c55e;padding:6px 16px;">
+          <i class="fas fa-plus"></i> Add Auction
+        </button>
+      </div>
+      <div class="content-card">
+        <div class="table-wrap">
+          <table class="admin-table" id="auctionsTable">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Title</th>
+                <th>Artist</th>
+                <th>Starting Bid</th>
+                <th>Current Bid</th>
+                <th>Bids</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="auctionsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SUBMISSIONS TAB ===== -->
+    <div class="tab-content" id="tab-submissions">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="heading-font text-2xl text-[#f5e6c8]">Photo Submissions</h2>
+        <span class="text-sm text-[#6b5846]">Approve or reject user submissions</span>
+      </div>
+      <div class="content-card">
+        <div class="table-wrap">
+          <table class="admin-table" id="submissionsTable">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Title</th>
+                <th>Artist</th>
+                <th>Category</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="submissionsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== COMMUNITY TAB ===== -->
+    <div class="tab-content" id="tab-community">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="heading-font text-2xl text-[#f5e6c8]">Community Gallery</h2>
+        <span class="text-sm text-[#6b5846]">Approved photos from users</span>
+      </div>
+      <div class="content-card">
+        <div class="card-body">
+          <div class="community-grid" id="communityGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== USERS TAB ===== -->
+    <div class="tab-content" id="tab-users">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="heading-font text-2xl text-[#f5e6c8]">Registered Users</h2>
+        <span class="text-sm text-[#6b5846]">Manage user accounts</span>
+      </div>
+      <div class="content-card">
+        <div class="table-wrap">
+          <table class="admin-table" id="usersTable">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Joined</th>
+                <th>Bids</th>
+                <th>Won</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== BIDS TAB ===== -->
+    <div class="tab-content" id="tab-bids">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="heading-font text-2xl text-[#f5e6c8]">Bid History</h2>
+        <span class="text-sm text-[#6b5846]">All bids placed on auctions</span>
+      </div>
+      <div class="content-card">
+        <div class="table-wrap">
+          <table class="admin-table" id="bidsTable">
+            <thead>
+              <tr>
+                <th>Bidder</th>
+                <th>Item</th>
+                <th>Amount</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="bidsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= ADD AUCTION MODAL ================= -->
+  <dialog id="addAuctionModal" class="modal">
+    <div class="modal-box">
+      <h3 class="heading-font text-2xl text-[#f5e6c8]">Add New Auction</h3>
+      <div class="divider" style="background:#3b2f2f;"></div>
+      <form id="addAuctionForm" onsubmit="addAuction(event)">
+        <label>Photo Title</label>
+        <input type="text" id="newTitle" placeholder="e.g. Morning Light" required />
+
+        <label>Artist / Photographer</label>
+        <input type="text" id="newArtist" placeholder="e.g. Jane Doe" required />
+
+        <label>Category</label>
+        <input type="text" id="newCategory" placeholder="e.g. Nature, Portrait, Urban" />
+
+        <label>Starting Bid ($)</label>
+        <input type="number" id="newStartBid" placeholder="100" required />
+
+        <label>Image URL</label>
+        <input type="text" id="newImage" placeholder="https://images.unsplash.com/photo-..." required />
+
+        <label>Description</label>
+        <textarea id="newDesc" rows="2" placeholder="A brief description of the photograph..."></textarea>
+
+        <label>Seller / Source</label>
+        <input type="text" id="newSeller" placeholder="e.g. Private Collection, Gallery Name" />
+
+        <div class="flex gap-3 mt-4">
+          <button type="submit" class="btn" style="background:var(--accent);color:#0f0c09;border:none;flex:1;">Create Auction</button>
+          <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--text-small);" onclick="document.getElementById('addAuctionModal').close()">Cancel</button>
+        </div>
+      </form>
+    </div>
+    <label class="modal-backdrop" for="addAuctionModal">Close</label>
+  </dialog>
+
+  <script>
+    // ── DATA STORE ──
+    let auctions = [{
+      id: 1,
+      title: 'El Capitan, Winter',
+      artist: 'Ansel Adams',
+      category: 'Landscape',
+      startBid: 600,
+      currentBid: 2800,
+      bidCount: 45,
+      img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&q=80',
+      desc: 'A classic black and white landscape photograph.',
+      seller: 'Private Collection, San Francisco',
+      status: 'live'
+    }, {
+      id: 2,
+      title: 'Portrait in Blue',
+      artist: 'Maya Chen',
+      category: 'Portrait',
+      startBid: 800,
+      currentBid: 1200,
+      bidCount: 18,
+      img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&q=80',
+      desc: 'A contemporary portrait exploring emotion.',
+      seller: 'Artist\'s Estate',
+      status: 'live'
+    }, {
+      id: 3,
+      title: 'Paris, 1956',
+      artist: 'Henri Cartier-Bresson',
+      category: 'Street',
+      startBid: 450,
+      currentBid: 950,
+      bidCount: 12,
+      img: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=200&q=80',
+      desc: 'Iconic street photography from post-war Paris.',
+      seller: 'Magnum Photos Archive',
+      status: 'live'
+    }, {
+      id: 4,
+      title: 'Forest Light',
+      artist: 'Sarah McEwan',
+      category: 'Nature',
+      startBid: 300,
+      currentBid: 620,
+      bidCount: 8,
+      img: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=200&q=80',
+      desc: 'Sunbeams through old-growth forest canopy.',
+      seller: 'Nature Conservancy Collection',
+      status: 'live'
+    }, {
+      id: 5,
+      title: 'The Thinker',
+      artist: 'Richard Avedon',
+      category: 'Portrait',
+      startBid: 1500,
+      currentBid: 1500,
+      bidCount: 22,
+      img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
+      desc: 'A powerful black and white portrait.',
+      seller: 'MoMA Collection',
+      status: 'ended'
+    }, {
+      id: 6,
+      title: 'Minimalist #12',
+      artist: 'Elena Vogt',
+      category: 'Abstract',
+      startBid: 200,
+      currentBid: 430,
+      bidCount: 5,
+      img: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=200&q=80',
+      desc: 'Abstract exploration of color and form.',
+      seller: 'Nordic Art Collective',
+      status: 'live'
+    }];
+
+    let submissions = [];
+    let communityPhotos = [];
+    let users = [{
+      id: 1,
+      name: 'John Doe',
+      email: 'john@example.com',
+      joined: 'Jan 2024',
+      bids: 23,
+      won: 2,
+      status: 'active'
+    }, {
+      id: 2,
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      joined: 'Feb 2024',
+      bids: 45,
+      won: 5,
+      status: 'active'
+    }, {
+      id: 3,
+      name: 'Robert Chen',
+      email: 'robert@example.com',
+      joined: 'Mar 2024',
+      bids: 12,
+      won: 1,
+      status: 'active'
+    }, {
+      id: 4,
+      name: 'Maria Garcia',
+      email: 'maria@example.com',
+      joined: 'Apr 2024',
+      bids: 67,
+      won: 8,
+      status: 'active'
+    }, {
+      id: 5,
+      name: 'David Kim',
+      email: 'david@example.com',
+      joined: 'May 2024',
+      bids: 8,
+      won: 0,
+      status: 'inactive'
+    }];
+
+    let bidHistory = [
+      { bidder: 'sunvault', item: 'El Capitan, Winter', amount: 2800, time: '2m ago', status: 'leading' },
+      { bidder: 'photo_kid', item: 'El Capitan, Winter', amount: 2600, time: '8m ago', status: 'outbid' },
+      { bidder: 'lensmaster', item: 'Portrait in Blue', amount: 1200, time: '5m ago', status: 'leading' },
+      { bidder: 'artcollector', item: 'Paris, 1956', amount: 950, time: '12m ago', status: 'leading' },
+      { bidder: 'gallery_owner', item: 'The Thinker', amount: 1500, time: '1h ago', status: 'won' },
+      { bidder: 'vintage_lover', item: 'Forest Light', amount: 620, time: '25m ago', status: 'leading' },
+    ];
+
+    let nextAuctionId = 7;
+    let nextSubmissionId = 1;
+    let revenue = 48230;
+
+    // ── RENDER FUNCTIONS ──
+
+    function renderRecentAuctions() {
+      const container = document.getElementById('recentAuctions');
+      const recent = auctions.slice(0, 4);
+      container.innerHTML = recent.map(a => `
+        <div class="row-item">
+          <div class="item-info">
+            <div class="thumb"><img src="${a.img}" alt="${a.title}" /></div>
+            <div>
+              <div class="name">${a.title}</div>
+              <div class="sub">by ${a.artist} · $${a.currentBid.toLocaleString()}</div>
+            </div>
+          </div>
+          <span class="item-status ${a.status === 'live' ? 'status-live' : 'status-ended'}">${a.status}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderRecentSubmissions() {
+      const container = document.getElementById('recentSubmissions');
+      const pending = submissions.filter(s => s.status === 'pending');
+      if (pending.length === 0) {
+        container.innerHTML = `<div class="row-item"><div class="item-info"><div class="name" style="color:var(--text-small);">No pending submissions</div></div></div>`;
+        return;
+      }
+      const recent = pending.slice(0, 4);
+      container.innerHTML = recent.map(s => `
+        <div class="row-item">
+          <div class="item-info">
+            <div class="thumb"><img src="${s.img}" alt="${s.title}" /></div>
+            <div>
+              <div class="name">${s.title}</div>
+              <div class="sub">by ${s.artist} · ${s.category}</div>
+            </div>
+          </div>
+          <span class="item-status status-pending">pending</span>
+        </div>
+      `).join('');
+    }
+
+    function renderAuctionsTable() {
+      const tbody = document.getElementById('auctionsTableBody');
+      tbody.innerHTML = auctions.map(a => `
+        <tr>
+          <td><div class="thumb-sm"><img src="${a.img}" alt="${a.title}" /></div></td>
+          <td><strong class="text-[#f5e6c8]">${a.title}</strong></td>
+          <td>${a.artist}</td>
+          <td>$${a.startBid.toLocaleString()}</td>
+          <td class="text-[#c8a97e]">$${a.currentBid.toLocaleString()}</td>
+          <td>${a.bidCount}</td>
+          <td><span class="item-status ${a.status === 'live' ? 'status-live' : a.status === 'ended' ? 'status-ended' : 'status-sold'}">${a.status}</span></td>
+          <td>
+            <button class="action-btn" onclick="editAuction(${a.id})"><i class="fas fa-edit"></i></button>
+            <button class="action-btn danger" onclick="deleteAuction(${a.id})"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('auctionBadge').textContent = auctions.filter(a => a.status === 'live').length;
+      document.getElementById('statAuctions').textContent = auctions.filter(a => a.status === 'live').length;
+    }
+
+    function renderSubmissionsTable() {
+      const tbody = document.getElementById('submissionsTableBody');
+      const pending = submissions.filter(s => s.status === 'pending');
+      if (pending.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-small);padding:2rem 0;">No pending submissions.</td></tr>`;
+        document.getElementById('submissionBadge').textContent = '0';
+        document.getElementById('statSubmissions').textContent = '0';
+        return;
+      }
+      tbody.innerHTML = pending.map(s => `
+        <tr>
+          <td><div class="thumb-sm"><img src="${s.img}" alt="${s.title}" /></div></td>
+          <td><strong class="text-[#f5e6c8]">${s.title}</strong></td>
+          <td>${s.artist}</td>
+          <td>${s.category}</td>
+          <td>${s.date}</td>
+          <td><span class="item-status status-pending">pending</span></td>
+          <td>
+            <button class="action-btn success" onclick="approveSubmission(${s.id})"><i class="fas fa-check"></i> Approve</button>
+            <button class="action-btn danger" onclick="rejectSubmission(${s.id})"><i class="fas fa-times"></i> Reject</button>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('submissionBadge').textContent = pending.length;
+      document.getElementById('statSubmissions').textContent = pending.length;
+    }
+
+    function renderCommunityGrid() {
+      const grid = document.getElementById('communityGrid');
+      if (communityPhotos.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-small);padding:2rem 0;">No community photos yet. Approve submissions to add them here.</div>`;
+        document.getElementById('communityBadge').textContent = '0';
+        document.getElementById('statCommunity').textContent = '0';
+        return;
+      }
+      grid.innerHTML = communityPhotos.map(p => `
+        <div class="community-item">
+          <img src="${p.img}" alt="${p.title}" />
+          <div class="info">
+            <div class="title">${p.title}</div>
+            <div class="artist">by ${p.artist}</div>
+            <div style="font-size:9px;color:var(--text-small);margin-top:2px;">${p.category}</div>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('communityBadge').textContent = communityPhotos.length;
+      document.getElementById('statCommunity').textContent = communityPhotos.length;
+    }
+
+    function renderUsersTable() {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td><strong class="text-[#f5e6c8]">${u.name}</strong></td>
+          <td>${u.email}</td>
+          <td>${u.joined}</td>
+          <td>${u.bids}</td>
+          <td>${u.won}</td>
+          <td><span class="item-status ${u.status === 'active' ? 'status-active' : 'status-inactive'}">${u.status}</span></td>
+          <td>
+            <button class="action-btn ${u.status === 'active' ? 'warning' : 'success'}" onclick="toggleUserStatus(${u.id})">
+              <i class="fas ${u.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      const activeUsers = users.filter(u => u.status === 'active').length;
+      document.getElementById('userBadge').textContent = activeUsers;
+      document.getElementById('statUsers').textContent = activeUsers;
+    }
+
+    function renderBidsTable() {
+      const tbody = document.getElementById('bidsTableBody');
+      tbody.innerHTML = bidHistory.map(b => `
+        <tr>
+          <td><strong class="text-[#f5e6c8]">${b.bidder}</strong></td>
+          <td>${b.item}</td>
+          <td class="text-[#c8a97e]">$${b.amount.toLocaleString()}</td>
+          <td>${b.time}</td>
+          <td><span class="item-status ${b.status === 'leading' ? 'status-live' : b.status === 'won' ? 'status-approved' : 'status-ended'}">${b.status}</span></td>
+        </tr>
+      `).join('');
+      document.getElementById('bidBadge').textContent = bidHistory.length;
+      document.getElementById('statBids').textContent = bidHistory.length;
+    }
+
+    function updateAllStats() {
+      const activeAuctions = auctions.filter(a => a.status === 'live').length;
+      const pendingSubmissions = submissions.filter(s => s.status === 'pending').length;
+      const activeUsers = users.filter(u => u.status === 'active').length;
+      document.getElementById('statAuctions').textContent = activeAuctions;
+      document.getElementById('statSubmissions').textContent = pendingSubmissions;
+      document.getElementById('statUsers').textContent = activeUsers;
+      document.getElementById('statBids').textContent = bidHistory.length;
+      document.getElementById('statCommunity').textContent = communityPhotos.length;
+      document.getElementById('statRevenue').textContent = '$' + revenue.toLocaleString();
+    }
+
+    // ── CRUD OPERATIONS ──
+
+    function addAuction(e) {
+      e.preventDefault();
+      const newAuction = {
+        id: nextAuctionId++,
+        title: document.getElementById('newTitle').value,
+        artist: document.getElementById('newArtist').value,
+        category: document.getElementById('newCategory').value || 'Uncategorized',
+        startBid: parseInt(document.getElementById('newStartBid').value),
+        currentBid: parseInt(document.getElementById('newStartBid').value),
+        bidCount: 0,
+        img: document.getElementById('newImage').value,
+        desc: document.getElementById('newDesc').value || 'No description provided.',
+        seller: document.getElementById('newSeller').value || 'Private Collection',
+        status: 'live'
+      };
+      auctions.unshift(newAuction);
+      document.getElementById('addAuctionModal').close();
+      document.getElementById('addAuctionForm').reset();
+      renderAll();
+      showToast('Auction created: ' + newAuction.title);
+    }
+
+    function editAuction(id) {
+      const auction = auctions.find(a => a.id === id);
+      if (!auction) return;
+      const newBid = prompt('Update current bid for "' + auction.title + '":', auction.currentBid);
+      if (newBid !== null) {
+        const val = parseInt(newBid);
+        if (!isNaN(val) && val > 0) {
+          auction.currentBid = val;
+          renderAll();
+          showToast('Updated bid for ' + auction.title);
+        }
+      }
+    }
+
+    function deleteAuction(id) {
+      if (confirm('Delete this auction permanently?')) {
+        auctions = auctions.filter(a => a.id !== id);
+        renderAll();
+        showToast('Auction deleted.');
+      }
+    }
+
+    // ── SUBMISSION APPROVAL SYSTEM ──
+
+    function approveSubmission(id) {
+      const sub = submissions.find(s => s.id === id);
+      if (!sub) return;
+
+      // Check if submission is already processed
+      if (sub.status !== 'pending') return;
+
+      // Update submission status
+      sub.status = 'approved';
+
+      // Add to community photos
+      communityPhotos.push({
+        id: communityPhotos.length + 1,
+        title: sub.title,
+        artist: sub.artist,
+        category: sub.category,
+        img: sub.img,
+        desc: sub.desc,
+        date: sub.date,
+        approvedDate: new Date().toLocaleDateString()
+      });
+
+      renderAll();
+      showToast('✅ Submission approved and added to community gallery: ' + sub.title);
+    }
+
+    function rejectSubmission(id) {
+      const sub = submissions.find(s => s.id === id);
+      if (!sub) return;
+      if (sub.status !== 'pending') return;
+
+      if (confirm('Reject this submission? The user will be notified.')) {
+        sub.status = 'rejected';
+        renderAll();
+        showToast('❌ Submission rejected: ' + sub.title);
+      }
+    }
+
+    // ── USER MANAGEMENT ──
+
+    function toggleUserStatus(id) {
+      const user = users.find(u => u.id === id);
+      if (user) {
+        user.status = user.status === 'active' ? 'inactive' : 'active';
+        renderAll();
+        showToast('User ' + user.name + ' status updated to ' + user.status);
+      }
+    }
+
+    // ── TAB SWITCHING ──
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      document.querySelectorAll('.admin-tab').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.admin-tab[data-tab="${tabName}"]`).classList.add('active');
+
+      // Refresh community tab content when switched to it
+      if (tabName === 'community') {
+        renderCommunityGrid();
+      }
+    }
+
+    // ── RENDER ALL ──
+
+    function renderAll() {
+      renderRecentAuctions();
+      renderRecentSubmissions();
+      renderAuctionsTable();
+      renderSubmissionsTable();
+      renderCommunityGrid();
+      renderUsersTable();
+      renderBidsTable();
+      updateAllStats();
+    }
+
+    // ── TOAST ──
+
+    let toastTimer;
+
+    function showToast(msg, err) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.borderColor = err ? '#ef4444' : 'var(--accent)';
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ── INIT ──
+
+    // Add some demo submissions
+    setTimeout(() => {
+      submissions.push({
+        id: nextSubmissionId++,
+        title: 'Dawn at the Lake',
+        artist: 'Emma Watson',
+        category: 'Nature',
+        desc: 'A serene morning captured at a misty lake.',
+        img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=200&q=80',
+        date: 'Dec 2024',
+        status: 'pending'
+      });
+      submissions.push({
+        id: nextSubmissionId++,
+        title: 'Urban Rhythm',
+        artist: 'Carlos Mendez',
+        category: 'Urban',
+        desc: 'City life captured in motion.',
+        img: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=200&q=80',
+        date: 'Dec 2024',
+        status: 'pending'
+      });
+      submissions.push({
+        id: nextSubmissionId++,
+        title: 'Silent Reflection',
+        artist: 'Aisha Patel',
+        category: 'Portrait',
+        desc: 'A moment of quiet contemplation.',
+        img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&q=80',
+        date: 'Dec 2024',
+        status: 'pending'
+      });
+      renderAll();
+    }, 300);
+
+    renderAll();
+  </script>
+
+</body>
+</html>
