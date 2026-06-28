@@ -3,178 +3,400 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Exhibition</title>
-  <!-- Tailwind + daisyUI (CDN) -->
+  <title>FraVi · Exhibition</title>
+  <!-- Tailwind + daisyUI -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.css" rel="stylesheet" type="text/css" />
-  <!-- Fonts: Georgia (headings) + Roboto (body & UI) -->
+  <!-- Fonts: Playfair Display (headings) + Inter (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome 6 (free) for icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #1a1418;
+      --bg-header: #0f0c09;
+      --bg-card: #110e0b;
+      --border: #3b2f2f;
+      --text-main: #e8dcc5;
+      --text-heading: #f5e6c8;
+      --accent: #c8a97e;
+      --text-secondary: #a8866a;
+      --text-small: #6b5846;
+    }
+    * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+    .heading-font { font-family: 'Playfair Display', serif; }
+    body { background: var(--bg-main); color: var(--text-main); }
+
+    /* Navigation */
+    .auction-nav {
+      background: var(--bg-header); border-bottom: 1px solid var(--border);
+      padding: .6rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .auction-nav-brand { font-family: 'Playfair Display', serif; font-size: .8rem; color: var(--text-small); letter-spacing: .1em; text-transform: uppercase; }
+    .auction-nav-brand span { color: var(--accent); }
+    .tab-bar { display: flex; gap: 3px; background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 6px; padding: 3px; flex-wrap: wrap; }
+    .tab-item { font-size: 12px; padding: 5px 14px; border-radius: 4px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-family: 'Inter', sans-serif; transition: background .15s, color .15s; white-space: nowrap; }
+    .tab-item.active { background: var(--bg-card); color: var(--text-heading); border: 1px solid var(--border); }
+    .tab-item .badge { background: var(--accent); color: #0f0c09; font-size: 9px; padding: 1px 6px; border-radius: 10px; margin-left: 4px; font-weight: 600; }
+
+    /* Gallery Grid */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 2rem; }
+    .gallery-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color .2s, transform .18s; cursor: pointer; }
+    .gallery-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .gallery-card .photo-area { height: 200px; background: #0d0b08; position: relative; overflow: hidden; }
+    .gallery-card .photo-area img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-card .card-body { padding: 1rem; }
+    .gallery-card .card-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--text-heading); }
+    .gallery-card .card-artist { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .gallery-card .card-meta { font-size: 11px; color: var(--text-small); margin-top: 6px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .gallery-card .card-meta span { display: flex; align-items: center; gap: 4px; }
+    .gallery-card .card-meta i { color: var(--accent); width: 14px; }
+
+    /* Section Navigation */
+    .section-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+    .section-nav button { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 6px 16px; border-radius: 20px; font-size: 12px; font-family: 'Inter', sans-serif; cursor: pointer; transition: all .2s; }
+    .section-nav button:hover { border-color: var(--accent); color: var(--text-heading); }
+    .section-nav button.active { background: var(--accent); color: #0f0c09; border-color: var(--accent); font-weight: 500; }
+
+    .competition-section { display: none; }
+    .competition-section.active { display: block; }
+    .competition-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--text-heading); margin-bottom: 0.3rem; }
+    .competition-sub { font-size: 12px; color: var(--text-small); margin-bottom: 1rem; }
+
+    /* Form Styles */
+    .form-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 600px; margin: 0 auto; }
+    .form-container label { display: block; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; margin-top: 16px; }
+    .form-container label:first-of-type { margin-top: 0; }
+    .form-container input, .form-container textarea, .form-container select {
+      width: 100%; background: #0a0806; border: 1px solid var(--border); color: var(--text-main);
+      padding: 10px 12px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px;
+      outline: none; transition: border-color .2s;
+    }
+    .form-container input:focus, .form-container textarea:focus, .form-container select:focus {
+      border-color: var(--accent);
+    }
+    .form-container .btn-submit {
+      width: 100%; margin-top: 20px; padding: 12px; background: var(--accent); color: #0f0c09;
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
+      font-family: 'Inter', sans-serif; transition: opacity .2s;
+    }
+    .form-container .btn-submit:hover { opacity: .85; }
+    .form-container .file-upload-area {
+      border: 2px dashed var(--border); border-radius: 8px; padding: 20px; text-align: center;
+      cursor: pointer; transition: border-color .2s; background: #0a0806;
+    }
+    .form-container .file-upload-area:hover { border-color: var(--accent); }
+    .form-container .file-upload-area i { font-size: 2rem; color: var(--text-small); display: block; margin-bottom: 6px; }
+    .form-container .file-upload-area p { font-size: 12px; color: var(--text-small); }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 20px; right: 20px; z-index: 200; background: var(--bg-card); border: 1px solid var(--accent); color: var(--text-main); padding: 10px 18px; border-radius: 6px; font-size: 13px; display: none; box-shadow: 0 4px 24px rgba(0,0,0,.6); max-width: 90%; }
+    .toast.show { display: block; animation: fadeup .22s ease; }
+    @keyframes fadeup { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+  </style>
 </head>
-<body class="font-['Roboto'] bg-[#f7f4ef] text-[#2a3a3d]">
+<body>
 
-  <!-- MAIN CONTAINER (no header / footer) -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+<div class="toast" id="toast"></div>
 
-    <!-- HERO (in page, no header) -->
-    <div class="relative bg-gradient-to-br from-[#eef0ea] to-[#e2e4db] rounded-2xl px-6 py-12 sm:py-16 mb-10 border-b-4 border-[#ca7c4c] shadow-sm overflow-hidden">
-      <div class="absolute right-0 bottom-0 w-64 h-64 bg-[#ca7c4c]/10 rounded-full blur-2xl"></div>
-      <div class="relative z-10 text-center max-w-3xl mx-auto">
-        <div class="text-sm font-light tracking-[0.25em] text-[#864e3e] uppercase mb-2 flex items-center justify-center gap-2">
-          <i class="fas fa-camera text-[#ca7c4c]"></i> frame & Vision
-        </div>
-        <h2 class="font-['Georgia'] text-4xl sm:text-5xl md:text-6xl font-normal text-[#578088] leading-tight">
-          Where <span class="text-[#ca7c4c]">vision</span> Meets <span class="text-[#578088]">frame</span>
-        </h2>
-        <p class="text-base sm:text-lg text-[#3d4f52] max-w-xl mx-auto mt-3 font-light">
-          An immersive exhibition of contemporary photography — texture, memory, and the interplay of natural &amp; industrial palettes.
-        </p>
-        <div class="flex flex-wrap justify-center gap-3 mt-6">
-          <button class="btn bg-[#ca7c4c] hover:bg-[#864e3e] text-white border-0 px-6 py-2.5 rounded-full text-sm font-medium shadow-md hover:shadow-lg transition-all flex items-center gap-2">
-            <i class="fas fa-compass"></i> Explore Gallery
-          </button>
-          <button class="btn bg-transparent border-2 border-white/70 text-white hover:bg-white hover:text-[#578088] px-6 py-2.5 rounded-full text-sm font-medium transition-all">
-            View Artists
-          </button>
-        </div>
-      </div>
+<!-- NAV -->
+<nav class="auction-nav">
+  <div class="auction-nav-brand">FraVi <span>/ Exhibition</span></div>
+  <div class="tab-bar" id="mainTabs">
+    <button class="tab-item active" onclick="switchTab('gallery')">Gallery</button>
+    <button class="tab-item" onclick="switchTab('submit')">Submit</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── GALLERY TAB ── -->
+  <div id="tab-gallery">
+
+    <!-- Section Navigation -->
+    <div class="section-nav" id="sectionNav">
+      <button class="active" data-section="fall">Fall Competition 2024</button>
+      <button data-section="leading">Leading Competition</button>
+      <button data-section="community">Community Picks</button>
+      <button data-section="recent">Recent Submissions</button>
     </div>
 
-    <!-- FILTER / CATEGORY TABS (Roboto small UI) -->
-    <div class="flex flex-wrap justify-center gap-2 sm:gap-4 border-b border-[#cfb580]/30 pb-4 mb-6" id="filterTabs">
-      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors active-tab" data-filter="all" style="border-bottom-color: #ca7c4c; color: #ca7c4c; font-weight: 500;">All</button>
-      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Abstract">Abstract</button>
-      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Urban">Urban</button>
-      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Nature">Nature</button>
-      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Portrait">Portrait</button>
-      <button class="font-['Roboto'] text-sm font-normal tracking-wide uppercase text-[#74948c] cursor-pointer px-1 py-1.5 border-b-2 border-transparent hover:text-[#578088] transition-colors" data-filter="Architecture">Architecture</button>
+    <!-- Fall Competition -->
+    <div class="competition-section active" id="section-fall">
+      <div class="competition-title">Fall Competition 2024 — Winners</div>
+      <div class="competition-sub">Best of the season · Juried selection</div>
+      <div class="gallery-grid" id="fallWinnersGrid"></div>
     </div>
 
-    <!-- GALLERY GRID -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="galleryGrid"></div>
-
-  </main>
-
-  <!-- LIGHTBOX (daisyUI modal) -->
-  <input type="checkbox" id="lightboxModal" class="modal-toggle" />
-  <div class="modal" role="dialog">
-    <div class="modal-box relative p-0 max-w-3xl">
-      <!-- close button (daisyui) -->
-      <label for="lightboxModal" class="btn btn-sm btn-circle absolute right-4 top-4 z-20 bg-black/30 text-white border-0 hover:bg-[#ca7c4c] transition-all">
-        <i class="fas fa-times"></i>
-      </label>
-      <div class="h-80 bg-cover bg-center bg-[#b7afa0]" id="lightboxImg" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=400&fit=crop&crop=center');"></div>
-      <div class="p-7 sm:p-8">
-        <h3 class="font-['Georgia'] text-3xl font-normal text-[#578088] mb-0.5" id="lightboxTitle">Title</h3>
-        <div class="font-['Roboto'] font-light text-lg text-[#74948c] mb-2.5" id="lightboxArtist">Artist</div>
-        <p class="font-['Roboto'] font-light text-base text-[#3d4f52] my-4 leading-relaxed" id="lightboxDesc">Description of the work.</p>
-        <div class="flex flex-wrap gap-5 border-t border-[#e6e2d8] pt-4 mt-1.5">
-          <span class="font-['Roboto'] text-sm text-[#74948c]"><strong class="text-[#2a3a3d] font-medium">Category:</strong> <span id="lightboxCategory">Abstract</span></span>
-          <span class="font-['Roboto'] text-sm text-[#74948c]"><strong class="text-[#2a3a3d] font-medium">Year:</strong> <span id="lightboxYear">2024</span></span>
-          <span class="font-['Roboto'] text-sm text-[#74948c]"><strong class="text-[#2a3a3d] font-medium">Medium:</strong> <span id="lightboxMedium">Digital</span></span>
-        </div>
-      </div>
+    <!-- Leading Competition -->
+    <div class="competition-section" id="section-leading">
+      <div class="competition-title">Leading Competition — Best in Show</div>
+      <div class="competition-sub">Top entries from our annual leading competition</div>
+      <div class="gallery-grid" id="leadingWinnersGrid"></div>
     </div>
-    <label class="modal-backdrop" for="lightboxModal">Close</label>
+
+    <!-- Community Picks -->
+    <div class="competition-section" id="section-community">
+      <div class="competition-title">Community Picks</div>
+      <div class="competition-sub">Photographs submitted and voted by the FraVi community</div>
+      <div class="gallery-grid" id="communityPicksGrid"></div>
+    </div>
+
+    <!-- Recent Submissions -->
+    <div class="competition-section" id="section-recent">
+      <div class="competition-title">Recent Submissions</div>
+      <div class="competition-sub">New photographs added by our community</div>
+      <div class="gallery-grid" id="recentSubmissionsGrid"></div>
+    </div>
   </div>
 
-  <script>
-    // ----- EXHIBITION DATA (20 items, matching your palette & categories) -----
-    const exhibitions = [
-      { id: 1, title: "Melothesia", artist: "Ricardo Guixà", category: "Abstract", desc: "An exploration of color and form through abstract composition.", year: "2025", medium: "Digital C-print", img: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=400&fit=crop&crop=center" },
-      { id: 2, title: "Under Destruction", artist: "Linda Jarrett", category: "Urban", desc: "Documenting urban decay and transformation.", year: "2024", medium: "Archival Inkjet", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=600&h=400&fit=crop&crop=center" },
-      { id: 3, title: "Ad Lucem", artist: "Gabriele Fossi", category: "Nature", desc: "Toward the light - a journey through natural landscapes.", year: "2023", medium: "Giclée", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop&crop=center" },
-      { id: 4, title: "Biosphere", artist: "Ilar Gunilla Persson", category: "Nature", desc: "The intersection of life and environment.", year: "2025", medium: "Lambda print", img: "https://images.unsplash.com/photo-1470071459604-7b8ec44ffd4b?w=600&h=400&fit=crop&crop=center" },
-      { id: 5, title: "Tuned Landscapes", artist: "Jurgen Rooijackers", category: "Abstract", desc: "Landscapes transformed through creative vision.", year: "2024", medium: "Pigment print", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=400&fit=crop&crop=center" },
-      { id: 6, title: "Reverie", artist: "Julia Wimmerlin", category: "Portrait", desc: "Dreamlike portraits exploring consciousness.", year: "2025", medium: "Silver gelatin", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=400&fit=crop&crop=center" },
-      { id: 7, title: "Half Remembered", artist: "Luca Ortis", category: "Abstract", desc: "Half remembered, half imagined memories.", year: "2023", medium: "Digital", img: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=400&fit=crop&crop=center&sat=-20" },
-      { id: 8, title: "Dialogue with the City", artist: "Natalia Rudychev", category: "Urban", desc: "Urban conversations captured in Le Mans, France.", year: "2024", medium: "Chromogenic", img: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600&h=400&fit=crop&crop=center" },
-      { id: 9, title: "Plain Plane Cuts", artist: "Olena Zubach", category: "Abstract", desc: "Geometric explorations of space and form.", year: "2025", medium: "Inkjet", img: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=600&h=400&fit=crop&crop=center" },
-      { id: 10, title: "Heartbeat", artist: "Fie Tanderup", category: "Portrait", desc: "The rhythm of human emotion.", year: "2024", medium: "Digital print", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&h=400&fit=crop&crop=center" },
-      { id: 11, title: "My Kingdom", artist: "Sonja de Ridder", category: "Nature", desc: "Personal landscapes of belonging.", year: "2023", medium: "Giclée", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop&crop=center" },
-      { id: 12, title: "Strangers", artist: "Svetlana Astakhova", category: "Portrait", desc: "Anonymous faces in the urban environment.", year: "2025", medium: "C-print", img: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&h=400&fit=crop&crop=center" },
-      { id: 13, title: "City Breath", artist: "Tany Pototska", category: "Urban", desc: "The living pulse of urban spaces.", year: "2024", medium: "Archival pigment", img: "https://images.unsplash.com/photo-1496568816309-51d7c20e3b21?w=600&h=400&fit=crop&crop=center" },
-      { id: 14, title: "Premium Mediocre", artist: "Xiaohan Lu", category: "Urban", desc: "Contemporary consumer culture examined.", year: "2025", medium: "Digital", img: "https://images.unsplash.com/photo-1559827291-72c739d2b0d6?w=600&h=400&fit=crop&crop=center" },
-      { id: 15, title: "Stranged", artist: "Bernard BOSC", category: "Abstract", desc: "Estrangement and isolation visualized.", year: "2023", medium: "Lambda", img: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=400&fit=crop&crop=center&sat=-30" },
-      { id: 16, title: "MELT", artist: "Beth Burstein", category: "Abstract", desc: "Forms dissolving and transforming.", year: "2024", medium: "Pigment", img: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=600&h=400&fit=crop&crop=center&sat=-10" },
-      { id: 17, title: "Between Worlds", artist: "Inna Skaldutska", category: "Nature", desc: "A bond between the physical and ethereal.", year: "2025", medium: "C-print", img: "https://images.unsplash.com/photo-1470071459604-7b8ec44ffd4b?w=600&h=400&fit=crop&crop=center&sat=10" },
-      { id: 18, title: "Bloom", artist: "Iryna Semko", category: "Nature", desc: "The beauty of natural growth and decay.", year: "2024", medium: "Archival", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop&crop=center&sat=10" },
-      { id: 19, title: "Constructs", artist: "Ken Collins", category: "Architecture", desc: "Architectural forms deconstructed.", year: "2023", medium: "Digital", img: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600&h=400&fit=crop&crop=center&sat=-20" },
-      { id: 20, title: "Vicissitudes", artist: "Jack Savage", category: "Architecture", desc: "The changing nature of desire.", year: "2025", medium: "Silver", img: "https://images.unsplash.com/photo-1496568816309-51d7c20e3b21?w=600&h=400&fit=crop&crop=center&sat=-20" }
-    ];
+  <!-- ── SUBMIT TAB ── -->
+  <div id="tab-submit" style="display:none;">
+    <div class="competition-title" style="text-align:center;">Submit Your Photograph</div>
+    <div class="competition-sub" style="text-align:center;margin-bottom:1.5rem;">Exhibit your work for free — join the FraVi community</div>
 
-    // ----- DOM refs -----
-    const grid = document.getElementById('galleryGrid');
-    const filterTabs = document.querySelectorAll('#filterTabs button');
-    const modalCheckbox = document.getElementById('lightboxModal');
-    const lightboxImg = document.getElementById('lightboxImg');
-    const lightboxTitle = document.getElementById('lightboxTitle');
-    const lightboxArtist = document.getElementById('lightboxArtist');
-    const lightboxDesc = document.getElementById('lightboxDesc');
-    const lightboxCategory = document.getElementById('lightboxCategory');
-    const lightboxYear = document.getElementById('lightboxYear');
-    const lightboxMedium = document.getElementById('lightboxMedium');
+    <div class="form-container">
+      <form id="submitForm" onsubmit="submitPhoto(event)">
+        <label>Your Name</label>
+        <input type="text" id="submitName" placeholder="e.g. Jane Doe" required />
 
-    // ----- render function -----
-    function renderGallery(filter) {
-      const filtered = filter === 'all' ? exhibitions : exhibitions.filter(ex => ex.category === filter);
-      grid.innerHTML = filtered.map(ex => `
-        <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-[#cfb580]/25 hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 cursor-pointer" data-id="${ex.id}" data-category="${ex.category}">
-          <div class="h-52 bg-cover bg-center transition-transform duration-300 hover:scale-105 relative" style="background-image: url('${ex.img}');">
-            <span class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white font-['Roboto'] text-[0.65rem] font-normal tracking-widest uppercase px-3.5 py-1 rounded-full">${ex.category}</span>
-          </div>
-          <div class="p-4 sm:p-5">
-            <h3 class="font-['Georgia'] text-xl font-normal text-[#2a3a3d]">${ex.title}</h3>
-            <div class="font-['Roboto'] text-sm font-light text-[#74948c]">${ex.artist}</div>
-            <div class="flex items-center justify-between mt-3 pt-3 border-t border-[#cfb580]/30">
-              <span class="font-['Roboto'] text-[0.7rem] font-normal tracking-wide uppercase text-[#864e3e]">${ex.year} · ${ex.medium}</span>
-              <i class="fas fa-arrow-right text-[#ca7c4c] opacity-70 transition-opacity"></i>
-            </div>
-          </div>
+        <label>Email Address</label>
+        <input type="email" id="submitEmail" placeholder="jane@example.com" required />
+
+        <label>Photograph Title</label>
+        <input type="text" id="submitTitle" placeholder="e.g. Morning Light" required />
+
+        <label>Category / Competition</label>
+        <select id="submitCategory" required>
+          <option value="">Select a category...</option>
+          <option value="Fall Competition 2024">Fall Competition 2024</option>
+          <option value="Leading Competition">Leading Competition</option>
+          <option value="Community Picks">Community Picks</option>
+          <option value="Recent Submissions">Recent Submissions</option>
+        </select>
+
+        <label>Description / Story</label>
+        <textarea id="submitDesc" rows="3" placeholder="Tell us about your photograph..."></textarea>
+
+        <label>Upload Image</label>
+        <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Click to upload or drag & drop</p>
+          <p style="font-size:10px;color:var(--text-small);margin-top:4px;">JPEG, PNG, WEBP · Max 5MB</p>
         </div>
-      `).join('');
+        <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)" />
 
-      // attach click listeners to cards -> open modal
-      document.querySelectorAll('#galleryGrid > div').forEach(card => {
-        card.addEventListener('click', function() {
-          const id = parseInt(this.dataset.id);
-          const ex = exhibitions.find(e => e.id === id);
-          if (ex) openLightbox(ex);
-        });
-      });
+        <label style="margin-top:12px;">Selected Image</label>
+        <div id="filePreview" style="padding:10px;border:1px solid var(--border);border-radius:8px;min-height:50px;display:flex;align-items:center;gap:10px;background:#0a0806;">
+          <span style="color:var(--text-small);font-size:13px;">No file selected</span>
+        </div>
+
+        <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Submit for Exhibition</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX MODAL -->
+<input type="checkbox" id="lightboxModal" class="modal-toggle" />
+<div class="modal" role="dialog">
+  <div class="modal-box relative p-0 max-w-3xl bg-[#110e0b] border border-[#3b2f2f]">
+    <label for="lightboxModal" class="btn btn-sm btn-circle absolute right-4 top-4 z-20 bg-black/30 text-white border-0 hover:bg-[#c8a97e] transition-all">
+      <i class="fas fa-times"></i>
+    </label>
+    <div class="h-80 bg-cover bg-center" id="lightboxImg" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=400&fit=crop&crop=center');"></div>
+    <div class="p-7 sm:p-8">
+      <h3 class="heading-font text-3xl text-[#f5e6c8] mb-0.5" id="lightboxTitle">Title</h3>
+      <div class="text-lg text-[#a8866a] mb-2.5" id="lightboxArtist">Artist</div>
+      <p class="text-base text-[#e8dcc5] my-4 leading-relaxed" id="lightboxDesc">Description of the work.</p>
+      <div class="flex flex-wrap gap-5 border-t border-[#3b2f2f] pt-4 mt-1.5">
+        <span class="text-sm text-[#6b5846]"><strong class="text-[#e8dcc5] font-medium">Category:</strong> <span id="lightboxCategory">Abstract</span></span>
+        <span class="text-sm text-[#6b5846]"><strong class="text-[#e8dcc5] font-medium">Submitted:</strong> <span id="lightboxDate">2024</span></span>
+      </div>
+    </div>
+  </div>
+  <label class="modal-backdrop" for="lightboxModal">Close</label>
+</div>
+
+<script>
+// ── DATA ──
+let userSubmissions = [];
+let submissionIdCounter = 100;
+
+// ── COMPETITION DATA ──
+const fallWinners = [
+  { id: 1, title: "Autumn Veil", artist: "Elena Vogt", category: "Fall Competition 2024", desc: "A misty morning in the forest captured during peak fall colors.", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&q=80", date: "Nov 2024" },
+  { id: 2, title: "Golden Hour Harvest", artist: "Marcus Reed", category: "Fall Competition 2024", desc: "Golden light over the autumn fields at sunset.", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80", date: "Oct 2024" },
+  { id: 3, title: "Falling Leaves", artist: "Sarah McEwan", category: "Fall Competition 2024", desc: "A study of light and motion through falling autumn leaves.", img: "https://images.unsplash.com/photo-1470071459604-7b8ec44ffd4b?w=400&q=80", date: "Nov 2024" },
+  { id: 4, title: "Frosted Morning", artist: "Thomas Berg", category: "Fall Competition 2024", desc: "The first frost of winter captured in the early morning light.", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80", date: "Dec 2024" }
+];
+
+const leadingWinners = [
+  { id: 5, title: "The Thinker", artist: "Richard Avedon", category: "Leading Competition", desc: "A powerful black and white portrait capturing human contemplation.", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80", date: "Mar 2024" },
+  { id: 6, title: "Urban Solitude", artist: "Natalia Rudychev", category: "Leading Competition", desc: "A solitary figure in the vast urban landscape.", img: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&q=80", date: "Feb 2024" },
+  { id: 7, title: "Milky Way", artist: "AstroJamal", category: "Leading Competition", desc: "The Milky Way over the Patagonian landscape.", img: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80", date: "Jan 2024" }
+];
+
+const communityPicks = [
+  { id: 8, title: "Cherry Blossom Lane", artist: "Sakura Frame", category: "Community Picks", desc: "A peaceful walk through blooming cherry blossoms in Kyoto.", img: "https://images.unsplash.com/photo-1520262454473-a596b9d7ae3c?w=400&q=80", date: "Apr 2024" },
+  { id: 9, title: "Neon Dreams", artist: "City Pulse", category: "Community Picks", desc: "Tokyo's neon streets captured in a moment of urban poetry.", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=400&q=80", date: "May 2024" },
+  { id: 10, title: "Desert Bloom", artist: "Arid Lens", category: "Community Picks", desc: "A rare desert flower blooming in the arid landscape.", img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&q=80", date: "Jun 2024" }
+];
+
+// ── RENDER FUNCTIONS ──
+function renderGallery(gridId, items) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  if (!items || items.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-small);padding:1rem 0;font-size:13px;">No photographs in this section yet.</div>`;
+    return;
+  }
+  grid.innerHTML = items.map(item => `
+    <div class="gallery-card" onclick="openLightbox(${item.id})" data-id="${item.id}">
+      <div class="photo-area">
+        <img src="${item.img}" alt="${item.title}" />
+      </div>
+      <div class="card-body">
+        <div class="card-title">${item.title}</div>
+        <div class="card-artist">by ${item.artist}</div>
+        <div class="card-meta">
+          <span><i class="fas fa-tag"></i> ${item.category}</span>
+          <span><i class="fas fa-calendar"></i> ${item.date || '2024'}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  grid._items = items;
+}
+
+// ── SECTION NAVIGATION ──
+document.querySelectorAll('.section-nav button').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.section-nav button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const section = this.dataset.section;
+    document.querySelectorAll('.competition-section').forEach(el => el.classList.remove('active'));
+    document.getElementById('section-' + section).classList.add('active');
+  });
+});
+
+// ── LIGHTBOX ──
+function openLightbox(id) {
+  const allItems = [...fallWinners, ...leadingWinners, ...communityPicks, ...userSubmissions];
+  const item = allItems.find(i => i.id === id);
+  if (!item) return;
+
+  document.getElementById('lightboxImg').style.backgroundImage = `url('${item.img}')`;
+  document.getElementById('lightboxTitle').textContent = item.title;
+  document.getElementById('lightboxArtist').textContent = item.artist;
+  document.getElementById('lightboxDesc').textContent = item.desc || 'A beautiful photograph from the FraVi community.';
+  document.getElementById('lightboxCategory').textContent = item.category;
+  document.getElementById('lightboxDate').textContent = item.date || '2024';
+  document.getElementById('lightboxModal').checked = true;
+}
+
+// ── TAB SWITCHING ──
+function switchTab(name) {
+  document.getElementById('tab-gallery').style.display = name === 'gallery' ? 'block' : 'none';
+  document.getElementById('tab-submit').style.display = name === 'submit' ? 'block' : 'none';
+  document.querySelectorAll('.tab-item').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.textContent.trim().toLowerCase() === name) btn.classList.add('active');
+  });
+}
+
+// ── FILE UPLOAD HANDLING ──
+let selectedFile = null;
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  selectedFile = file;
+  const preview = document.getElementById('filePreview');
+  preview.innerHTML = `<span style="color:var(--text-secondary);font-size:13px;">📷 ${file.name} (${(file.size/1024).toFixed(0)} KB)</span>`;
+}
+
+// ── SUBMIT FORM ──
+function submitPhoto(e) {
+  e.preventDefault();
+
+  const name = document.getElementById('submitName').value.trim();
+  const email = document.getElementById('submitEmail').value.trim();
+  const title = document.getElementById('submitTitle').value.trim();
+  const category = document.getElementById('submitCategory').value;
+  const desc = document.getElementById('submitDesc').value.trim();
+
+  if (!name || !email || !title || !category) {
+    showToast('Please fill in all required fields', true);
+    return;
+  }
+
+  if (!selectedFile) {
+    showToast('Please select an image to upload', true);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const imgUrl = e.target.result;
+
+    const newItem = {
+      id: submissionIdCounter++,
+      title: title,
+      artist: name,
+      category: category,
+      desc: desc || 'Submitted by ' + name,
+      img: imgUrl,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+      isUserSubmitted: true
+    };
+
+    userSubmissions.push(newItem);
+    renderGallery('recentSubmissionsGrid', userSubmissions);
+
+    if (category === 'Fall Competition 2024') {
+      fallWinners.push(newItem);
+      renderGallery('fallWinnersGrid', fallWinners);
+    } else if (category === 'Leading Competition') {
+      leadingWinners.push(newItem);
+      renderGallery('leadingWinnersGrid', leadingWinners);
+    } else if (category === 'Community Picks') {
+      communityPicks.push(newItem);
+      renderGallery('communityPicksGrid', communityPicks);
     }
 
-    // ----- open lightbox (daisyUI modal) -----
-    function openLightbox(ex) {
-      lightboxImg.style.backgroundImage = `url('${ex.img}')`;
-      lightboxTitle.textContent = ex.title;
-      lightboxArtist.textContent = ex.artist;
-      lightboxDesc.textContent = ex.desc;
-      lightboxCategory.textContent = ex.category;
-      lightboxYear.textContent = ex.year;
-      lightboxMedium.textContent = ex.medium;
-      modalCheckbox.checked = true;
-    }
+    document.getElementById('submitForm').reset();
+    document.getElementById('filePreview').innerHTML = '<span style="color:var(--text-small);font-size:13px;">No file selected</span>';
+    selectedFile = null;
+    document.getElementById('fileInput').value = '';
 
-    // ----- filter logic -----
-    filterTabs.forEach(tab => {
-      tab.addEventListener('click', function() {
-        filterTabs.forEach(t => {
-          t.classList.remove('border-[#ca7c4c]', 'text-[#ca7c4c]', 'font-medium');
-          t.classList.add('border-transparent', 'text-[#74948c]', 'font-normal');
-        });
-        this.classList.remove('border-transparent', 'text-[#74948c]', 'font-normal');
-        this.classList.add('border-[#ca7c4c]', 'text-[#ca7c4c]', 'font-medium');
-        const filter = this.dataset.filter;
-        renderGallery(filter);
-      });
-    });
+    showToast('Your photograph "' + title + '" has been submitted for exhibition!');
+  };
+  reader.readAsDataURL(selectedFile);
+}
 
-    // initial render
-    renderGallery('all');
-  </script>
+// ── TOAST ──
+let toastTimer;
+
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = err ? '#f05050' : 'var(--accent)';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── INIT ──
+renderGallery('fallWinnersGrid', fallWinners);
+renderGallery('leadingWinnersGrid', leadingWinners);
+renderGallery('communityPicksGrid', communityPicks);
+renderGallery('recentSubmissionsGrid', userSubmissions);
+</script>
 </body>
 </html>

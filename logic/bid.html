@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FraVi · Photography Auctions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-main: #1a1418;
+  --bg-header: #0f0c09;
+  --bg-card: #110e0b;
+  --border: #3b2f2f;
+  --text-main: #e8dcc5;
+  --text-heading: #f5e6c8;
+  --accent: #c8a97e;
+  --text-secondary: #a8866a;
+  --text-small: #6b5846;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; font-weight: 400; }
+
+/* NAV */
+.auction-nav {
+  background: var(--bg-header); border-bottom: 1px solid var(--border);
+  padding: .6rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.auction-nav-brand { font-family: 'Playfair Display', serif; font-size: .8rem; color: var(--text-small); letter-spacing: .1em; text-transform: uppercase; }
+.auction-nav-brand span { color: var(--accent); }
+.tab-bar { display: flex; gap: 3px; background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 6px; padding: 3px; flex-wrap: wrap; }
+.tab-item { font-size: 12px; padding: 5px 14px; border-radius: 4px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-family: 'Inter', sans-serif; transition: background .15s, color .15s; white-space: nowrap; }
+.tab-item.active { background: var(--bg-card); color: var(--text-heading); border: 1px solid var(--border); }
+.tab-item .badge { background: var(--accent); color: #0f0c09; font-size: 9px; padding: 1px 6px; border-radius: 10px; margin-left: 4px; font-weight: 600; }
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: #f05050; animation: blink 1.1s infinite; display: inline-block; flex-shrink: 0; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+/* SECTION */
+.section-eyebrow { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--text-heading); margin-bottom: 1.25rem; }
+.gold-rule { width: 40px; height: 1px; background: var(--accent); margin: .5rem 0 1.1rem; }
+
+/* STAT BAR */
+.stat-bar { display: flex; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 2rem; flex-wrap: wrap; }
+.stat-cell { flex: 1; background: var(--bg-card); padding: .9rem 1.1rem; display: flex; flex-direction: column; gap: 2px; min-width: 80px; }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--accent); }
+.stat-lbl { font-size: 11px; color: var(--text-small); letter-spacing: .04em; }
+
+/* AUCTION CARD */
+.auction-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; margin-bottom: 2rem; }
+.auction-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color .2s, transform .18s; cursor: pointer; }
+.auction-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.auction-card.featured { border-color: rgba(200,169,126,.4); }
+.auction-card.sold { opacity: 0.5; cursor: not-allowed; }
+.auction-card.sold .photo-area::after { content: 'SOLD'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; font-weight: 800; color: var(--accent); letter-spacing: 4px; background: rgba(0,0,0,0.7); padding: 10px 30px; border-radius: 8px; border: 2px solid var(--accent); z-index: 5; }
+.photo-area { height: 200px; background: #0d0b08; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; user-select: none; }
+.photo-area img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.live-badge { position: absolute; top: 9px; left: 9px; background: rgba(10,6,3,.75); border: 1px solid #c84040; color: #f08080; font-size: 10px; font-weight: 500; letter-spacing: .06em; padding: 2px 8px; border-radius: 3px; display: flex; align-items: center; gap: 4px; z-index: 2; }
+.tag-badge { position: absolute; top: 9px; right: 9px; background: rgba(200,169,126,.1); border: 1px solid var(--accent); color: var(--accent); font-size: 10px; padding: 2px 8px; border-radius: 3px; font-family: 'Inter', sans-serif; font-weight: 500; letter-spacing: .05em; z-index: 2; }
+.hot-badge { color: #f0c040; border-color: #f0c040; background: rgba(240,192,64,.08); }
+.buy-badge { color: #7ab87e; border-color: #5c8c60; background: rgba(92,140,96,.1); left: 9px; right: auto; }
+.sold-badge { color: #f08080; border-color: #c84040; background: rgba(200,64,64,.1); left: 9px; right: auto; }
+.card-body { padding: .9rem 1rem 1rem; }
+.card-title-text { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--text-heading); margin-bottom: 2px; line-height: 1.3; }
+.card-meta { font-size: 11px; color: var(--text-small); margin-bottom: .65rem; }
+.card-divider { height: 1px; background: var(--border); margin-bottom: .65rem; }
+.bid-row { display: flex; justify-content: space-between; align-items: flex-end; }
+.bid-label { font-size: 10px; color: var(--text-small); letter-spacing: .05em; text-transform: uppercase; }
+.bid-amount { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--text-heading); line-height: 1; }
+.bid-count { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.timer-line { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-small); margin-top: .55rem; }
+.timer-urgent { color: #f08080; }
+
+/* BUTTONS */
+.btn-bid { background: transparent; border: 1px solid var(--accent); color: var(--accent); font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; padding: 6px 16px; border-radius: 4px; cursor: pointer; transition: background .15s, color .15s; letter-spacing: .04em; }
+.btn-bid:hover { background: var(--accent); color: #0f0c09; }
+.btn-buy { background: transparent; border: 1px solid #5c8c60; color: #7ab87e; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; padding: 6px 16px; border-radius: 4px; cursor: pointer; transition: background .15s, color .15s; }
+.btn-buy:hover { background: #5c8c60; color: #fff; }
+.btn-buy.sold { opacity: 0.4; cursor: not-allowed; }
+
+/* BID PANEL */
+.bid-panel-wrap { display: none; margin-bottom: 2rem; }
+.bid-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.35rem; }
+
+.photo-detail-strip {
+  display: flex; gap: 14px; align-items: center;
+  padding: 12px 14px; border-radius: 6px;
+  background: #0a0806; border: 1px solid var(--border);
+  margin-bottom: 1.1rem;
+}
+.photo-thumb-sm {
+  width: 64px; height: 64px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; flex-shrink: 0; overflow: hidden;
+}
+.photo-thumb-sm img { width: 100%; height: 100%; object-fit: cover; }
+.photo-detail-info { flex: 1; min-width: 0; }
+.photo-detail-title { font-family: 'Playfair Display', serif; font-size: .95rem; color: var(--text-heading); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.photo-detail-meta { font-size: 11px; color: var(--text-small); line-height: 1.5; }
+.photo-detail-tags { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
+.detail-tag { font-size: 10px; padding: 1px 7px; border-radius: 3px; background: rgba(200,169,126,.08); border: 1px solid rgba(200,169,126,.15); color: var(--accent); }
+
+/* PHOTO STORY SECTION */
+.photo-story {
+  background: #0a0806; border: 1px solid var(--border); border-radius: 6px;
+  padding: 12px 14px; margin: 10px 0 14px;
+}
+.photo-story .story-label {
+  font-size: 9px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-small); margin-bottom: 4px;
+}
+.photo-story .story-text {
+  font-size: 12px; color: var(--text-secondary); line-height: 1.6;
+  font-style: italic;
+}
+.photo-story .story-details {
+  display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px;
+  font-size: 11px; color: var(--text-small);
+}
+.photo-story .story-details span {
+  display: flex; align-items: center; gap: 4px;
+}
+.photo-story .story-details i { color: var(--accent); width: 14px; }
+
+.bid-input { width: 100%; background: #0f0c09; border: 1px solid var(--border); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 14px; padding: 9px 14px; border-radius: 4px; outline: none; transition: border-color .15s; margin-bottom: 8px; }
+.bid-input:focus { border-color: var(--accent); }
+.btn-place-bid { width: 100%; background: var(--accent); border: none; color: #0f0c09; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; padding: 10px; border-radius: 4px; cursor: pointer; letter-spacing: .04em; transition: opacity .15s; }
+.btn-place-bid:hover { opacity: .85; }
+.btn-place-bid:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.bh-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 5px;
+  background: #0a0806; margin-bottom: 5px;
+  border-left: 2px solid transparent;
+  transition: border-color .15s;
+}
+.bh-row.mine { border-left-color: var(--accent); }
+.bh-photo-thumb {
+  width: 38px; height: 38px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0; overflow: hidden;
+}
+.bh-photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.bh-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; flex-shrink: 0; }
+.bh-center { flex: 1; min-width: 0; }
+.bh-name { font-size: 12px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bh-photo-name { font-size: 10px; color: var(--text-small); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.bh-right { text-align: right; flex-shrink: 0; }
+.bh-amount { font-family: 'Playfair Display', serif; font-size: 13px; color: var(--text-secondary); }
+.bh-amount.mine { color: var(--accent); }
+.bh-time { font-size: 10px; color: var(--text-small); margin-top: 1px; }
+
+.countdown-block { display: flex; gap: 3px; align-items: flex-start; }
+.cd-unit { text-align: center; }
+.cd-num { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--accent); background: #0a0806; border: 1px solid var(--border); border-radius: 3px; padding: 2px 7px; display: block; min-width: 34px; }
+.cd-lbl { font-size: 9px; color: var(--text-small); letter-spacing:.06em; text-transform:uppercase; margin-top:2px; }
+.cd-sep { font-size: 1rem; color: var(--border); align-self: center; padding-bottom: 14px; }
+
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; }
+.pill-gold { background: rgba(200,169,126,.1); color: var(--accent); border: 1px solid rgba(200,169,126,.25); }
+.pill-green { background: rgba(92,140,96,.1); color: #7ab87e; border: 1px solid rgba(92,140,96,.25); }
+.pill-red { background: rgba(200,64,64,.1); color: #f08080; border: 1px solid rgba(200,64,64,.25); }
+
+.bid-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.bid-table th { color: var(--text-small); font-weight: 400; font-size: 10px; letter-spacing:.07em; text-transform:uppercase; padding: 6px 0; border-bottom: 1px solid var(--border); text-align:left; }
+.bid-table td { padding: 10px 0; border-bottom: 1px solid #111; color: var(--text-main); vertical-align: middle; }
+.bid-table tr:last-child td { border-bottom: none; }
+.my-bid-thumb { width: 34px; height: 34px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; overflow: hidden; }
+.my-bid-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.toast { position: fixed; bottom: 20px; right: 20px; z-index: 200; background: var(--bg-card); border: 1px solid var(--accent); color: var(--text-main); padding: 10px 18px; border-radius: 6px; font-size: 13px; display: none; box-shadow: 0 4px 24px rgba(0,0,0,.6); max-width: 90%; }
+.toast.show { display: block; animation: fadeup .22s ease; }
+@keyframes fadeup { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+
+/* CHECKOUT MODAL */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8); z-index: 999; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 2rem; max-width: 480px; width: 95%; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+}
+.modal-box h3 { font-family: 'Playfair Display', serif; color: var(--text-heading); font-size: 1.4rem; margin-bottom: 0.5rem; }
+.modal-box .sub { color: var(--text-small); font-size: 13px; margin-bottom: 1.2rem; }
+.modal-box label { display: block; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; margin-top: 12px; }
+.modal-box input, .modal-box textarea, .modal-box select {
+  width: 100%; background: #0a0806; border: 1px solid var(--border); color: var(--text-main);
+  padding: 10px 12px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 13px;
+  outline: none; transition: border-color .2s;
+}
+.modal-box input:focus, .modal-box textarea:focus {
+  border-color: var(--accent);
+}
+.modal-box .btn-confirm {
+  width: 100%; margin-top: 18px; padding: 12px; background: var(--accent); color: #0f0c09;
+  border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: opacity .2s;
+}
+.modal-box .btn-confirm:hover { opacity: .85; }
+.modal-box .btn-cancel {
+  width: 100%; margin-top: 8px; padding: 10px; background: transparent; color: var(--text-small);
+  border: 1px solid var(--border); border-radius: 6px; font-size: 13px; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: border-color .2s;
+}
+.modal-box .btn-cancel:hover { border-color: var(--text-secondary); }
+.modal-box .price-display {
+  font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--accent);
+  padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal-box">
+    <h3 id="checkoutTitle">Confirm Purchase</h3>
+    <p class="sub" id="checkoutSub">You are about to buy this photograph</p>
+    <div class="price-display" id="checkoutPrice">$320</div>
+
+    <label>Full Name</label>
+    <input type="text" id="checkoutName" placeholder="John Doe" />
+
+    <label>Email Address</label>
+    <input type="email" id="checkoutEmail" placeholder="john@example.com" />
+
+    <label>Phone Number</label>
+    <input type="tel" id="checkoutPhone" placeholder="+1 234 567 8900" />
+
+    <label>Delivery Address</label>
+    <textarea id="checkoutAddress" rows="2" placeholder="Street, City, State, ZIP"></textarea>
+
+    <label>Payment Method</label>
+    <select id="checkoutPayment">
+      <option value="credit">Credit Card</option>
+      <option value="debit">Debit Card</option>
+      <option value="paypal">PayPal</option>
+    </select>
+
+    <button class="btn-confirm" onclick="confirmPurchase()">✔ Confirm Purchase</button>
+    <button class="btn-cancel" onclick="closeCheckout()">Cancel</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="auction-nav">
+  <div class="auction-nav-brand">FraVi <span>/ Auctions</span></div>
+  <div class="tab-bar" id="mainTabs">
+    <button class="tab-item active" onclick="switchTab('live')">Live bids</button>
+    <button class="tab-item" onclick="switchTab('buynow')">Buy now</button>
+    <button class="tab-item" onclick="switchTab('mybids')">My bids <span class="badge" id="navBidCount">0</span></button>
+    <button class="tab-item" onclick="switchTab('collection')">📷 Collection <span class="badge" id="navCollectionCount">0</span></button>
+  </div>
+  <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;background:rgba(200,169,126,.08);border:1px solid rgba(200,169,126,.2);color:var(--accent);white-space:nowrap;">
+    <span class="live-dot"></span> Bidding open
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── LIVE BIDS ── -->
+  <div id="tab-live">
+
+    <div class="stat-bar">
+      <div class="stat-cell"><div class="stat-num">382</div><div class="stat-lbl">Bidders online</div></div>
+      <div class="stat-cell"><div class="stat-num" style="color:#f08080;" id="nextCloses">22m</div><div class="stat-lbl">Next lot closes</div></div>
+      <div class="stat-cell"><div class="stat-num" id="soldToday">$48k</div><div class="stat-lbl">Sold today</div></div>
+      <div class="stat-cell"><div class="stat-num" id="myBidCount">0</div><div class="stat-lbl">Your active bids</div></div>
+    </div>
+
+    <!-- BID PANEL -->
+    <div class="bid-panel-wrap" id="bidPanelWrap">
+      <div class="section-eyebrow">Active bidding</div>
+      <div class="section-title" id="bidPanelTitle" style="margin-bottom:.4rem;">—</div>
+      <div class="gold-rule"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="bid-panel">
+          <div class="photo-detail-strip" id="photoDetailStrip">
+            <div class="photo-thumb-sm" id="panelPhotoThumb"></div>
+            <div class="photo-detail-info">
+              <div class="photo-detail-title" id="panelPhotoTitle">—</div>
+              <div class="photo-detail-meta" id="panelPhotoMeta">—</div>
+              <div class="photo-detail-tags" id="panelPhotoTags"></div>
+            </div>
+          </div>
+
+          <!-- PHOTO STORY SECTION -->
+          <div class="photo-story" id="photoStory">
+            <div class="story-label">📖 Story behind the photograph</div>
+            <div class="story-text" id="storyText">—</div>
+            <div class="story-details">
+              <span><i class="fas fa-camera"></i> <span id="storyPhotographer">—</span></span>
+              <span><i class="fas fa-user"></i> <span id="storyPreviousOwner">—</span></span>
+              <span><i class="fas fa-calendar"></i> <span id="storyYear">—</span></span>
+              <span><i class="fas fa-check-circle"></i> <span id="storyCondition">—</span></span>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:1rem;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:10px;color:var(--text-small);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">Current highest bid</div>
+              <div style="font-family:'Playfair Display',serif;font-size:2rem;color:var(--accent);line-height:1;" id="currentBidDisplay">—</div>
+              <div style="font-size:11px;color:var(--text-secondary);margin-top:3px;" id="bidCountDisplay"></div>
+            </div>
+            <div class="countdown-block">
+              <div class="cd-unit"><span class="cd-num" id="cdH">00</span><div class="cd-lbl">hrs</div></div>
+              <div class="cd-sep">:</div>
+              <div class="cd-unit"><span class="cd-num" id="cdM">00</span><div class="cd-lbl">min</div></div>
+              <div class="cd-sep">:</div>
+              <div class="cd-unit"><span class="cd-num" id="cdS">00</span><div class="cd-lbl">sec</div></div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text-small);margin-bottom:5px;" id="minBidLabel">—</div>
+          <input class="bid-input" type="number" id="bidInput" placeholder="Enter your bid amount" />
+          <button class="btn-place-bid" id="placeBidBtn" onclick="placeBid()">Place bid</button>
+          <div style="font-size:10px;color:var(--text-small);margin-top:7px;text-align:center;">Buyer's premium 10% · Charged on win</div>
+          <button onclick="closeBidPanel()" style="display:block;width:100%;margin-top:8px;background:none;border:1px solid var(--border);color:var(--text-small);font-size:11px;padding:6px;border-radius:4px;cursor:pointer;font-family:'Inter',sans-serif;">Close</button>
+        </div>
+        <div class="bid-panel">
+          <div style="font-size:10px;color:var(--text-small);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.75rem;">Bid history</div>
+          <div id="bidHistoryList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID -->
+    <div class="section-eyebrow">Open lots</div>
+    <div class="section-title">Live auctions</div>
+
+    <div class="auction-grid" id="auctionGrid"></div>
+  </div>
+
+  <!-- ── BUY NOW ── -->
+  <div id="tab-buynow" style="display:none;">
+    <div class="section-eyebrow">Fixed price</div>
+    <div class="section-title">Buy now — no bidding needed</div>
+    <div class="auction-grid" id="buyNowGrid"></div>
+  </div>
+
+  <!-- ── MY BIDS ── -->
+  <div id="tab-mybids" style="display:none;">
+    <div class="section-eyebrow">Your activity</div>
+    <div class="section-title">My bids</div>
+    <div class="bid-panel" style="max-width:720px;">
+      <table class="bid-table">
+        <thead><tr><th style="width:44px;"></th><th>Photograph</th><th>Photographer</th><th>Your bid</th><th>Status</th><th style="text-align:right;">Ends</th></tr></thead>
+        <tbody id="myBidsTableBody">
+          <tr id="emptyBidsRow"><td colspan="6" style="text-align:center;color:var(--text-small);padding:2rem 0;font-size:13px;">No bids placed yet — go to <button onclick="switchTab('live')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;padding:0;">Live auctions</button> to start bidding</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-small);">
+        <span id="myBidsSummary">0 active bids</span>
+        <button class="btn-bid" style="font-size:11px;padding:5px 14px;" onclick="switchTab('live')">Browse auctions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── COLLECTION ── -->
+  <div id="tab-collection" style="display:none;">
+    <div class="section-eyebrow">Your gallery</div>
+    <div class="section-title">My Collection</div>
+    <div id="collectionGrid" class="auction-grid">
+      <div style="grid-column:1/-1;text-align:center;color:var(--text-small);padding:3rem 0;font-size:14px;">
+        <i class="fas fa-camera" style="font-size:2rem;display:block;margin-bottom:10px;opacity:0.3;"></i>
+        Your collection is empty. <button onclick="switchTab('buynow')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;padding:0;">Buy a photograph</button> or <button onclick="switchTab('live')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;padding:0;">win an auction</button> to add to your collection.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DATA ──
+let currentPhotoKey = '';
+let currentBid = 0;
+let currentBidCount = 0;
+let cdEndTime = 0;
+const photoMeta = {};
+const myBids = {};
+const collection = [];
+let soldToday = 48000;
+let bidCounter = 1;
+
+// ── PHOTO STORY DATA ──
+const photoStories = {
+  'El Capitan, Winter': {
+    story: 'Captured during a rare winter storm in Yosemite. The photographer waited 3 days in sub-zero temperatures to get this perfect shot of El Capitan emerging from the clouds. This is one of only 5 prints ever made from the original negative.',
+    photographer: 'Ansel Adams (1902-1984)',
+    previousOwner: 'Private Collection, San Francisco',
+    year: '1942',
+    condition: 'Excellent · Museum quality'
+  },
+  'Portrait in Blue': {
+    story: 'A contemporary portrait exploring the relationship between light and emotion. The subject is a close friend of the photographer, and the blue tones represent a period of quiet reflection during the pandemic.',
+    photographer: 'Maya Chen',
+    previousOwner: 'Artist\'s Estate',
+    year: '2023',
+    condition: 'Mint · Archival print'
+  },
+  'Paris, 1956': {
+    story: 'This iconic street photograph captures the essence of post-war Paris. The photographer was a young aspiring artist who would later become one of the most celebrated street photographers of the 20th century.',
+    photographer: 'Henri Cartier-Bresson',
+    previousOwner: 'Magnum Photos Archive',
+    year: '1956',
+    condition: 'Very Good · Slight vintage aging'
+  },
+  'Forest Light': {
+    story: 'Shot in the ancient forests of the Pacific Northwest. The photographer spent a month living in a cabin to capture the ever-changing light patterns through the old-growth canopy. This print captures a rare moment of perfect sunbeams.',
+    photographer: 'Sarah McEwan',
+    previousOwner: 'Nature Conservancy Collection',
+    year: '2024',
+    condition: 'Mint · Premium archival paper'
+  },
+  'The Thinker': {
+    story: 'A powerful black and white portrait that captures the intensity of human contemplation. The subject was a philosophy professor who had just lost his wife. The photograph became an iconic representation of grief and resilience.',
+    photographer: 'Richard Avedon',
+    previousOwner: 'The Museum of Modern Art, NY',
+    year: '1948',
+    condition: 'Excellent · Recently restored'
+  },
+  'Minimalist #12': {
+    story: 'Part of a series exploring the intersection of color and emotion. This piece was created during the artist\'s residency in Iceland, inspired by the stark beauty of the Arctic landscape and the play of light on the tundra.',
+    photographer: 'Elena Vogt',
+    previousOwner: 'Nordic Art Collective',
+    year: '2024',
+    condition: 'Mint · Limited edition (1/10)'
+  }
+};
+
+// ── AUCTION ITEMS ──
+const auctionItems = [
+  { id: 1, title: 'El Capitan, Winter', startBid: 600, bidCount: 45, minutes: 22, img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80', artist: '@vintagelens', meta: 'Classic B&W · 1942', tag: 'HOT', tags: 'ANALOG,ORIGINAL,B&W', featured: true },
+  { id: 2, title: 'Portrait in Blue', startBid: 800, bidCount: 18, minutes: 45, img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80', artist: '@modernstudio', meta: 'Contemporary · 2023', tag: 'PORTRAIT', tags: 'PORTRAIT,COLOR,NEW' },
+  { id: 3, title: 'Paris, 1956', startBid: 450, bidCount: 12, minutes: 90, img: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80', artist: '@streetclassic', meta: 'Street · 1956', tag: 'HISTORIC', tags: 'STREET,VINTAGE,FRANCE' },
+  { id: 4, title: 'Forest Light', startBid: 300, bidCount: 8, minutes: 130, img: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=80', artist: '@naturelens', meta: 'Nature · 2024', tag: 'LANDSCAPE', tags: 'LANDSCAPE,FINE ART,NATURE' },
+  { id: 5, title: 'The Thinker', startBid: 1500, bidCount: 22, minutes: 70, img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', artist: '@classicportrait', meta: 'B&W Portrait · 1948', tag: 'HOT', tags: 'PORTRAIT,ANALOG,ORIGINAL' },
+  { id: 6, title: 'Minimalist #12', startBid: 200, bidCount: 5, minutes: 160, img: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&q=80', artist: '@modernminimal', meta: 'Contemporary · 2024', tag: 'NEW', tags: 'MINIMAL,ABSTRACT,COLOR' }
+];
+
+// ── BUY NOW ITEMS ──
+const buyNowItems = [
+  { id: 'b1', title: 'Cherry Blossom, Kyoto', price: 320, img: 'https://images.unsplash.com/photo-1520262454473-a596b9d7ae3c?w=400&q=80', artist: '@sakuraframe', meta: 'Nature · 2023' },
+  { id: 'b2', title: 'Paris, 1956 — Print', price: 550, img: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80', artist: '@streetclassic', meta: 'Street · 1956' },
+  { id: 'b3', title: 'Andromeda Rising', price: 410, img: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80', artist: '@astrojamal', meta: 'Landscape · 2022' }
+];
+
+// ── RENDER AUCTION GRID ──
+function renderAuctionGrid() {
+  const grid = document.getElementById('auctionGrid');
+  grid.innerHTML = '';
+  auctionItems.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = 'auction-card' + (item.featured ? ' featured' : '') + (item.sold ? ' sold' : '');
+    card.id = 'card-' + item.id;
+    card.onclick = function() {
+      if (!item.sold) openBidPanel(item.title, item.startBid, item.bidCount, item.minutes, item.img, item.artist, item.meta, item.tag, item.tags);
+    };
+    card.innerHTML = `
+      <div class="photo-area">
+        <img src="${item.img}" alt="${item.title}" />
+        ${!item.sold ? '<div class="live-badge"><span class="live-dot"></span> LIVE</div>' : ''}
+        <div class="tag-badge ${item.tag === 'HOT' ? 'hot-badge' : ''}">${item.tag}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title-text">${item.title}</div>
+        <div class="card-meta">by ${item.artist} · ${item.meta}</div>
+        <div class="card-divider"></div>
+        <div class="bid-row">
+          <div>
+            <div class="bid-label">${item.sold ? 'Sold for' : 'Current bid'}</div>
+            <div class="bid-amount" id="amount-${item.id}">$${item.startBid.toLocaleString()}</div>
+            <div class="bid-count" id="count-${item.id}">${item.sold ? 'Sold' : item.bidCount + ' bids'}</div>
+          </div>
+          ${!item.sold ? `<button class="btn-bid" onclick="event.stopPropagation();openBidPanel('${item.title}',${item.startBid},${item.bidCount},${item.minutes},'${item.img}','${item.artist}','${item.meta}','${item.tag}','${item.tags}')">Place bid</button>` : '<span style="color:var(--text-small);font-size:11px;">SOLD</span>'}
+        </div>
+        <div class="timer-line ${item.minutes < 30 ? 'timer-urgent' : ''}">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          ${item.sold ? 'Sold' : 'Ends in <span id="t' + (index+1) + '" style="margin-left:3px;font-weight:500;"></span>'}
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ── RENDER BUY NOW GRID ──
+function renderBuyNowGrid() {
+  const grid = document.getElementById('buyNowGrid');
+  grid.innerHTML = '';
+  buyNowItems.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'auction-card' + (item.sold ? ' sold' : '');
+    card.id = 'buy-card-' + item.id;
+    card.innerHTML = `
+      <div class="photo-area">
+        <img src="${item.img}" alt="${item.title}" />
+        <div class="tag-badge ${item.sold ? 'sold-badge' : 'buy-badge'}">${item.sold ? 'SOLD' : 'AVAILABLE'}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title-text">${item.title}</div>
+        <div class="card-meta">by ${item.artist} · ${item.meta}</div>
+        <div class="card-divider"></div>
+        <div class="bid-row">
+          <div>
+            <div class="bid-label">${item.sold ? 'Sold' : 'Price'}</div>
+            <div class="bid-amount">$${item.price.toLocaleString()}</div>
+          </div>
+          ${!item.sold ? `<button class="btn-buy" onclick="event.stopPropagation();openCheckout('${item.title}',${item.price},'${item.img}','${item.artist}','${item.meta}')">Buy now</button>` : '<span style="color:var(--text-small);font-size:11px;">SOLD</span>'}
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ── TAB SWITCHING ──
+function switchTab(name) {
+  ['live','buynow','mybids','collection'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-item').forEach((btn, i) => {
+    btn.classList.remove('active');
+    const tabs = ['live','buynow','mybids','collection'];
+    if (tabs[i] === name) btn.classList.add('active');
+  });
+  if (name === 'collection') renderCollection();
+}
+
+// ── CHECKOUT MODAL ──
+let checkoutData = null;
+
+function openCheckout(title, price, img, artist, meta) {
+  checkoutData = { title, price, img, artist, meta };
+  document.getElementById('checkoutTitle').textContent = 'Confirm Purchase';
+  document.getElementById('checkoutSub').textContent = 'You are about to buy "' + title + '"';
+  document.getElementById('checkoutPrice').textContent = '$' + price.toLocaleString();
+  document.getElementById('checkoutName').value = '';
+  document.getElementById('checkoutEmail').value = '';
+  document.getElementById('checkoutPhone').value = '';
+  document.getElementById('checkoutAddress').value = '';
+  document.getElementById('checkoutPayment').value = 'credit';
+  document.getElementById('checkoutModal').classList.add('active');
+}
+
+function closeCheckout() {
+  document.getElementById('checkoutModal').classList.remove('active');
+  checkoutData = null;
+}
+
+function confirmPurchase() {
+  const name = document.getElementById('checkoutName').value.trim();
+  const email = document.getElementById('checkoutEmail').value.trim();
+  const phone = document.getElementById('checkoutPhone').value.trim();
+  const address = document.getElementById('checkoutAddress').value.trim();
+
+  if (!name || !email || !phone || !address) {
+    showToast('⚠ Please fill in all fields', true);
+    return;
+  }
+
+  if (!checkoutData) return;
+
+  collection.push({
+    title: checkoutData.title,
+    price: checkoutData.price,
+    img: checkoutData.img,
+    artist: checkoutData.artist,
+    meta: checkoutData.meta,
+    purchased: new Date().toLocaleDateString(),
+    name: name
+  });
+
+  const buyItem = buyNowItems.find(i => i.title === checkoutData.title);
+  if (buyItem) buyItem.sold = true;
+
+  soldToday += checkoutData.price;
+  document.getElementById('soldToday').textContent = '$' + soldToday.toLocaleString();
+
+  closeCheckout();
+  renderBuyNowGrid();
+  updateCollectionBadge();
+  showToast('✅ Purchased "' + checkoutData.title + '" for $' + checkoutData.price.toLocaleString() + '! Check your collection.');
+  checkoutData = null;
+}
+
+// ── OPEN BID PANEL ──
+function openBidPanel(title, amount, bids, minutesLeft, imgUrl, artist, meta, tag, tagsStr) {
+  const item = auctionItems.find(i => i.title === title);
+  if (item && item.sold) {
+    showToast('⚠ This item has been sold', true);
+    return;
+  }
+
+  currentBid = amount;
+  currentBidCount = bids;
+  currentPhotoKey = title;
+  cdEndTime = Date.now() + minutesLeft * 60000;
+
+  photoMeta[title] = { imgUrl, artist, meta, tags: tagsStr.split(',') };
+
+  document.getElementById('bidPanelTitle').textContent = title;
+
+  const thumb = document.getElementById('panelPhotoThumb');
+  thumb.innerHTML = '<img src="' + imgUrl + '" alt="' + title + '" />';
+  document.getElementById('panelPhotoTitle').textContent = title;
+  document.getElementById('panelPhotoMeta').innerHTML = '<b style="color:var(--accent)">' + artist + '</b> &nbsp;·&nbsp; ' + meta;
+  const tagsEl = document.getElementById('panelPhotoTags');
+  tagsEl.innerHTML = '';
+  tagsStr.split(',').forEach(t => {
+    const s = document.createElement('span');
+    s.className = 'detail-tag'; s.textContent = t.trim();
+    tagsEl.appendChild(s);
+  });
+
+  // Load photo story
+  const story = photoStories[title] || {
+    story: 'A remarkable photograph with a rich history. Details about its creation and provenance are available upon request.',
+    photographer: artist,
+    previousOwner: 'Private Collection',
+    year: meta.split('·')[1] || 'Unknown',
+    condition: 'Good'
+  };
+  document.getElementById('storyText').textContent = story.story;
+  document.getElementById('storyPhotographer').textContent = story.photographer;
+  document.getElementById('storyPreviousOwner').textContent = story.previousOwner;
+  document.getElementById('storyYear').textContent = story.year;
+  document.getElementById('storyCondition').textContent = story.condition;
+
+  const minBid = amount + 1;
+  document.getElementById('currentBidDisplay').textContent = '$' + amount.toLocaleString();
+  document.getElementById('bidCountDisplay').textContent = bids + ' bids so far';
+  document.getElementById('minBidLabel').textContent = '💰 Must bid higher than $' + amount.toLocaleString() + ' (minimum: $' + minBid.toLocaleString() + ')';
+  document.getElementById('bidInput').placeholder = 'Enter amount (min $' + minBid.toLocaleString() + ')';
+  document.getElementById('bidInput').min = minBid;
+  document.getElementById('bidInput').value = '';
+  document.getElementById('placeBidBtn').disabled = false;
+
+  const wrap = document.getElementById('bidPanelWrap');
+  wrap.style.display = 'block';
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Build bid history
+  const history = document.getElementById('bidHistoryList');
+  history.innerHTML = '';
+
+  const bidHistory = [];
+  const numBids = Math.min(bids, 20);
+  let currentPrice = amount - 100;
+
+  for (let i = numBids; i > 0; i--) {
+    const bidAmount = currentPrice - (i * 15) + Math.floor(Math.random() * 30);
+    if (bidAmount > 50) {
+      const names = ['sunvault', 'photo_kid', 'lensmaster', 'artcollector', 'gallery_owner', 'vintage_lover', 'modern_eye', 'shutterbug'];
+      const initials = ['SV', 'PK', 'LM', 'AC', 'GO', 'VL', 'ME', 'SB'];
+      const colors = ['rgba(160,128,96,.08)', 'rgba(92,140,96,.08)', 'rgba(80,80,160,.08)', 'rgba(200,100,80,.08)', 'rgba(80,160,160,.08)'];
+      const idx = Math.floor(Math.random() * names.length);
+      const timeAgo = (i * 2 + Math.floor(Math.random() * 5)) + 'm ago';
+      bidHistory.push({
+        name: names[idx % names.length],
+        initial: initials[idx % initials.length],
+        color: colors[idx % colors.length],
+        amount: Math.max(50, bidAmount),
+        time: timeAgo
+      });
+    }
+  }
+
+  bidHistory.sort((a, b) => b.amount - a.amount);
+
+  bidHistory.slice(0, 15).forEach(b => {
+    const row = document.createElement('div');
+    row.className = 'bh-row';
+    row.innerHTML = `
+      <div class="bh-avatar" style="background:${b.color};color:var(--accent);">${b.initial}</div>
+      <div class="bh-photo-thumb"><img src="${imgUrl}" alt="" /></div>
+      <div class="bh-center"><div class="bh-name">${b.name}</div><div class="bh-photo-name">${title}</div></div>
+      <div class="bh-right"><div class="bh-amount">$${b.amount.toLocaleString()}</div><div class="bh-time">${b.time}</div></div>
+    `;
+    history.appendChild(row);
+  });
+
+  if (bidHistory.length > 0) {
+    const topRow = document.createElement('div');
+    topRow.className = 'bh-row';
+    topRow.style.borderLeftColor = 'var(--accent)';
+    topRow.innerHTML = `
+      <div class="bh-avatar" style="background:rgba(200,169,126,.15);color:var(--accent);">★</div>
+      <div class="bh-photo-thumb"><img src="${imgUrl}" alt="" /></div>
+      <div class="bh-center"><div class="bh-name" style="color:var(--accent);font-weight:600;">Current Highest</div><div class="bh-photo-name">${title}</div></div>
+      <div class="bh-right"><div class="bh-amount" style="color:var(--accent);font-size:15px;">$${amount.toLocaleString()}</div><div class="bh-time">Current</div></div>
+    `;
+    history.insertBefore(topRow, history.firstChild);
+  }
+}
+
+function closeBidPanel() {
+  document.getElementById('bidPanelWrap').style.display = 'none';
+}
+
+// ── PLACE BID ──
+function placeBid() {
+  const val = parseInt(document.getElementById('bidInput').value);
+  const minBid = currentBid + 1;
+
+  if (!val || isNaN(val)) {
+    showToast('⚠ Please enter a valid bid amount', true);
+    return;
+  }
+
+  if (val <= currentBid) {
+    showToast('⚠ Your bid must be higher than $' + currentBid.toLocaleString() + ' (minimum: $' + minBid.toLocaleString() + ')', true);
+    return;
+  }
+
+  const item = auctionItems.find(i => i.title === currentPhotoKey);
+  if (item) {
+    item.startBid = val;
+    item.bidCount += 1;
+    const amountEl = document.getElementById('amount-' + item.id);
+    if (amountEl) amountEl.textContent = '$' + val.toLocaleString();
+    const countEl = document.getElementById('count-' + item.id);
+    if (countEl) countEl.textContent = item.bidCount + ' bids';
+  }
+
+  currentBid = val;
+  currentBidCount += 1;
+
+  document.getElementById('currentBidDisplay').textContent = '$' + val.toLocaleString();
+  document.getElementById('bidCountDisplay').textContent = currentBidCount + ' bids so far';
+  document.getElementById('minBidLabel').textContent = '💰 Must bid higher than $' + val.toLocaleString() + ' (minimum: $' + (val + 1).toLocaleString() + ')';
+  document.getElementById('bidInput').placeholder = 'Enter amount (min $' + (val + 1).toLocaleString() + ')';
+  document.getElementById('bidInput').min = val + 1;
+  document.getElementById('bidInput').value = '';
+
+  const pm = photoMeta[currentPhotoKey];
+  const list = document.getElementById('bidHistoryList');
+  list.querySelectorAll('.mine').forEach(r => r.classList.remove('mine'));
+
+  const row = document.createElement('div');
+  row.className = 'bh-row mine';
+  row.innerHTML = `
+    <div class="bh-avatar" style="background:rgba(200,169,126,.1);color:var(--accent);">YO</div>
+    <div class="bh-photo-thumb"><img src="${pm.imgUrl}" alt="" /></div>
+    <div class="bh-center"><div class="bh-name" style="color:var(--accent);font-weight:500;">You <span class="pill pill-gold" style="font-size:9px;padding:1px 5px;margin-left:3px;">Leading</span></div><div class="bh-photo-name">${currentPhotoKey}</div></div>
+    <div class="bh-right"><div class="bh-amount mine">$${val.toLocaleString()}</div><div class="bh-time">Just now</div></div>`;
+  list.insertBefore(row, list.firstChild);
+
+  myBids[currentPhotoKey] = {
+    amount: val,
+    imgUrl: pm.imgUrl,
+    title: currentPhotoKey,
+    artist: pm.artist,
+    meta: pm.meta
+  };
+  updateMyBidsTab();
+  updateBidBadges();
+  showToast('✓ Bid of $' + val.toLocaleString() + ' placed on "' + currentPhotoKey + '"');
+}
+
+// ── UPDATE MY BIDS ──
+function updateMyBidsTab() {
+  const tbody = document.getElementById('myBidsTableBody');
+  const emptyRow = document.getElementById('emptyBidsRow');
+  const keys = Object.keys(myBids);
+  if (keys.length === 0) { emptyRow.style.display = ''; document.getElementById('myBidsSummary').textContent = '0 active bids'; return; }
+  emptyRow.style.display = 'none';
+  Array.from(tbody.querySelectorAll('tr.dynamic-bid-row')).forEach(r => r.remove());
+  keys.forEach(key => {
+    const b = myBids[key];
+    const tr = document.createElement('tr');
+    tr.className = 'dynamic-bid-row';
+    tr.innerHTML = `
+      <td><div class="my-bid-thumb"><img src="${b.imgUrl}" alt="" /></div></td>
+      <td style="font-family:'Playfair Display',serif;">${b.title}</td>
+      <td style="color:var(--text-small);font-size:11px;">${b.artist}</td>
+      <td style="color:var(--accent);font-weight:500;">$${b.amount.toLocaleString()}</td>
+      <td><span class="pill pill-gold">Leading</span></td>
+      <td style="text-align:right;font-size:11px;color:var(--text-small);">Active</td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('myBidsSummary').textContent = keys.length + ' active bid' + (keys.length > 1 ? 's' : '');
+}
+
+function updateBidBadges() {
+  const count = Object.keys(myBids).length;
+  document.getElementById('myBidCount').textContent = count;
+  document.getElementById('navBidCount').textContent = count;
+}
+
+function updateCollectionBadge() {
+  document.getElementById('navCollectionCount').textContent = collection.length;
+}
+
+// ── RENDER COLLECTION ──
+function renderCollection() {
+  const grid = document.getElementById('collectionGrid');
+  if (collection.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;color:var(--text-small);padding:3rem 0;font-size:14px;">
+        <i class="fas fa-camera" style="font-size:2rem;display:block;margin-bottom:10px;opacity:0.3;"></i>
+        Your collection is empty. <button onclick="switchTab('buynow')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;padding:0;">Buy a photograph</button> or <button onclick="switchTab('live')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;padding:0;">win an auction</button> to add to your collection.
+      </div>
+    `;
+    return;
+  }
+  grid.innerHTML = '';
+  collection.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = 'auction-card';
+    card.innerHTML = `
+      <div class="photo-area">
+        <img src="${item.img}" alt="${item.title}" />
+        <div class="tag-badge" style="background:rgba(200,169,126,.2);border-color:var(--accent);color:var(--accent);">COLLECTION</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title-text">${item.title}</div>
+        <div class="card-meta">by ${item.artist} · ${item.meta}</div>
+        <div class="card-divider"></div>
+        <div class="bid-row">
+          <div>
+            <div class="bid-label">Purchased for</div>
+            <div class="bid-amount" style="color:var(--accent);">$${item.price.toLocaleString()}</div>
+            <div class="bid-count">${item.purchased}</div>
+          </div>
+          <span style="color:#7ab87e;font-size:11px;font-weight:500;">✓ In your collection</span>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ── TOAST ──
+let toastTimer;
+
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = err ? '#f05050' : 'var(--accent)';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── TIMERS ──
+const cardEndTimes = auctionItems.map(item => Date.now() + item.minutes * 60000);
+
+function fmtTimer(ms) {
+  if (ms <= 0) return 'Ended';
+  const h = Math.floor(ms / 3600000),
+    m = Math.floor((ms % 3600000) / 60000),
+    s = Math.floor((ms % 60000) / 1000);
+  if (h > 0) return h + 'h ' + String(m).padStart(2, '0') + 'm';
+  return m + 'm ' + String(s).padStart(2, '0') + 's';
+}
+
+function tickTimers() {
+  cardEndTimes.forEach((end, i) => {
+    const el = document.getElementById('t' + (i + 1));
+    if (el) el.textContent = fmtTimer(end - Date.now());
+  });
+  const earliest = Math.min(...cardEndTimes.map(t => t - Date.now()));
+  const nextCloses = document.getElementById('nextCloses');
+  if (nextCloses) nextCloses.textContent = fmtTimer(earliest);
+}
+tickTimers();
+setInterval(tickTimers, 1000);
+
+function tickCD() {
+  const ms = Math.max(0, cdEndTime - Date.now());
+  const h = Math.floor(ms / 3600000),
+    m = Math.floor((ms % 3600000) / 60000),
+    s = Math.floor((ms % 60000) / 1000);
+  document.getElementById('cdH').textContent = String(h).padStart(2, '0');
+  document.getElementById('cdM').textContent = String(m).padStart(2, '0');
+  document.getElementById('cdS').textContent = String(s).padStart(2, '0');
+}
+tickCD();
+setInterval(tickCD, 1000);
+
+// ── INIT ──
+renderAuctionGrid();
+renderBuyNowGrid();
+updateBidBadges();
+updateCollectionBadge();
+</script>
+</body>
+</html>

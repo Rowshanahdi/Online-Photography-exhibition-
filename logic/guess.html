@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Guess the Picture Quiz</title>
+
+
+<link href="https://cdn.jsdelivr.net/npm/daisyui@latest/dist/full.min.css"
+rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+
+<script>
+
+tailwind.config = {
+
+theme:{
+
+extend:{
+
+colors:{
+
+background:"#0F172A",
+
+card:"#1E293B",
+
+card2:"#334155",
+
+accent:"#38BDF8",
+
+correct:"#22C55E",
+
+wrong:"#EF4444"
+
+}
+
+}
+
+}
+
+}
+
+</script>
+<style>
+
+.timer-circle{
+    width:100px;
+    height:100px;
+    position:relative;
+}
+
+
+.timer-circle svg{
+
+    width:100px;
+    height:100px;
+
+    transform:rotate(-90deg);
+
+}
+
+
+.circle-bg{
+
+    fill:none;
+    stroke:#334155;
+    stroke-width:8;
+
+}
+
+
+.circle-progress{
+
+    fill:none;
+    stroke:#38BDF8;
+    stroke-width:8;
+
+    stroke-linecap:round;
+
+    stroke-dasharray:283;
+    stroke-dashoffset:0;
+
+    transition:stroke-dashoffset 1s linear;
+
+}
+
+
+.timer-number{
+
+    position:absolute;
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    font-size:24px;
+    font-weight:bold;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body class="bg-background text-white min-h-screen overflow-auto">
+
+
+<!-- ================= NAVBAR ================= -->
+
+
+<div class="navbar bg-card border-b border-slate-700 px-8 h-16 shadow-xl">
+
+
+<div class="flex-1">
+
+<h1 class="text-3xl font-bold text-accent">
+
+📸 Guess the Picture Quiz
+
+</h1>
+
+</div>
+
+
+
+<div class="flex-none gap-3">
+
+
+<button
+onclick="rulesModal.showModal()"
+class="btn btn-outline btn-info">
+
+Rules
+
+</button>
+
+
+
+<button class="btn btn-error">
+
+Exit
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+<!-- ================= MAIN ================= -->
+
+
+<div class="min-h-[calc(100vh-64px)] p-5">
+
+
+<div class="grid grid-cols-12 gap-5 min-h-full">
+
+
+
+<!-- ================= LEFT PANEL ================= -->
+
+
+<div class="col-span-9">
+
+
+<div class="bg-card rounded-2xl shadow-2xl p-6 flex flex-col">
+
+
+
+<!-- Question Header -->
+
+
+<div class="flex justify-between items-center">
+
+
+<h2 class="text-3xl font-bold">
+
+Question
+
+<span id="questionNumber"
+class="text-accent">
+
+1
+
+</span>
+
+/10
+
+</h2>
+
+
+
+
+
+
+
+<div class="timer-circle">
+    
+    <svg>
+        <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
+        <circle class="circle-progress" 
+        id="circleProgress"
+        cx="50" cy="50" r="45"></circle>
+    </svg>
+
+    <div class="timer-number">
+        <span id="timer">30</span>s
+    </div>
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- Question -->
+
+
+<div class="mt-5">
+
+
+<h2 id="question"
+class="text-2xl font-semibold">
+
+Which picture uses Leading Lines?
+
+</h2>
+
+
+</div>
+
+
+
+
+
+<!-- IMAGE GRID -->
+
+
+<div class="mt-6">
+
+
+<div id="imageGrid"
+class="grid grid-cols-2 gap-5">
+
+
+
+<!-- OPTION A -->
+
+
+<div id="option0"
+onclick="checkAnswer(0)"
+class="relative bg-card2 rounded-2xl overflow-hidden
+border-2 border-transparent cursor-pointer
+hover:border-accent hover:scale-[1.02]
+transition-all duration-300">
+
+
+<div id="badge0"
+class="hidden absolute top-3 right-3 z-20
+w-10 h-10 rounded-full
+bg-correct text-xl font-bold
+flex items-center justify-center">
+
+✓
+
+</div>
+
+
+
+<div class="absolute top-3 left-3 z-20 badge badge-primary">
+
+A
+
+</div>
+
+
+
+<img id="img0"
+src="https://picsum.photos/700/450?1"
+class="w-full h-56 object-cover">
+
+
+
+<div class="p-3">
+
+<h3 class="text-center font-semibold text-lg">
+
+Option A
+
+</h3>
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- OPTION B -->
+
+
+<div id="option1"
+onclick="checkAnswer(1)"
+class="relative bg-card2 rounded-2xl overflow-hidden
+border-2 border-transparent cursor-pointer
+hover:border-accent hover:scale-[1.02]
+transition-all duration-300">
+
+
+<div id="badge1"
+class="hidden absolute top-3 right-3 z-20
+w-10 h-10 rounded-full
+bg-correct text-xl font-bold
+flex items-center justify-center">
+
+✓
+
+</div>
+
+
+
+<div class="absolute top-3 left-3 z-20 badge badge-primary">
+
+B
+
+</div>
+
+
+
+<img id="img1"
+src="https://picsum.photos/700/450?2"
+class="w-full h-56 object-cover">
+
+
+<div class="p-3">
+
+<h3 class="text-center font-semibold text-lg">
+
+Option B
+
+</h3>
+
+</div>
+
+
+</div>
+<!-- OPTION C -->
+
+
+<div id="option2"
+onclick="checkAnswer(2)"
+class="relative bg-card2 rounded-2xl overflow-hidden
+border-2 border-transparent cursor-pointer
+hover:border-accent hover:scale-[1.02]
+transition-all duration-300">
+
+
+<div id="badge2"
+class="hidden absolute top-3 right-3 z-20
+w-10 h-10 rounded-full
+bg-correct text-xl font-bold
+flex items-center justify-center">
+
+✓
+
+</div>
+
+
+
+<div class="absolute top-3 left-3 z-20 badge badge-primary">
+
+C
+
+</div>
+
+
+
+<img id="img2"
+src="https://picsum.photos/700/450?3"
+class="w-full h-56 object-cover">
+
+
+<div class="p-3">
+
+<h3 class="text-center font-semibold text-lg">
+
+Option C
+
+</h3>
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- OPTION D -->
+
+
+<div id="option3"
+onclick="checkAnswer(3)"
+class="relative bg-card2 rounded-2xl overflow-hidden
+border-2 border-transparent cursor-pointer
+hover:border-accent hover:scale-[1.02]
+transition-all duration-300">
+
+
+<div id="badge3"
+class="hidden absolute top-3 right-3 z-20
+w-10 h-10 rounded-full
+bg-correct text-xl font-bold
+flex items-center justify-center">
+
+✓
+
+</div>
+
+
+
+<div class="absolute top-3 left-3 z-20 badge badge-primary">
+
+D
+
+</div>
+
+
+
+<img id="img3"
+src="https://picsum.photos/700/450?4"
+class="w-full h-56 object-cover">
+
+
+<div class="p-3">
+
+<h3 class="text-center font-semibold text-lg">
+
+Option D
+
+</h3>
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+</div>
+
+
+
+
+
+<!-- FEEDBACK -->
+
+
+<div id="feedbackMessage"
+class="hidden mt-5 rounded-xl bg-card2 border border-slate-600 p-4">
+
+
+<h3 id="feedbackTitle"
+class="text-xl font-bold text-accent">
+
+Correct!
+
+</h3>
+
+
+<p id="feedbackText"
+class="mt-2 text-gray-300">
+
+Explanation will appear here.
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- ================================================= -->
+<!-- RIGHT PANEL -->
+<!-- ================================================= -->
+
+
+<div class="col-span-3">
+
+
+<div class="bg-card rounded-2xl shadow-2xl p-5 h-full">
+
+
+
+<h2 class="text-center text-2xl font-bold text-accent">
+
+Game Status
+
+</h2>
+
+
+
+
+
+<div class="mt-6 space-y-4">
+
+
+
+<!-- SCORE -->
+
+
+<div class="bg-card2 rounded-xl p-4 shadow-lg">
+
+
+<div class="flex justify-between items-center">
+
+
+<span class="text-lg">
+
+🎯 Score
+
+</span>
+
+
+<span id="score"
+class="text-3xl font-bold text-accent">
+
+0
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- LIVES -->
+
+
+<div class="bg-card2 rounded-xl p-4 shadow-lg">
+
+
+<div class="flex justify-between items-center">
+
+
+<span class="text-lg">
+
+❤️ Lives
+
+</span>
+
+
+<span id="lives"
+class="text-2xl">
+
+❤️❤️❤️
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- TIME -->
+
+
+<div class="bg-card2 rounded-xl p-4 shadow-lg">
+
+
+<div class="flex justify-between items-center">
+
+
+<span>
+
+⏱ Time
+
+</span>
+
+
+<span id="statusTimer"
+class="text-2xl font-bold text-info">
+
+30s
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- QUESTION -->
+
+
+<div class="bg-card2 rounded-xl p-4 shadow-lg">
+
+
+<div class="flex justify-between items-center">
+
+
+<span>
+
+📖 Question
+
+</span>
+
+
+<span id="statusQuestion"
+class="text-xl font-bold">
+
+1 / 10
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- PROGRESS -->
+
+
+<div class="bg-card2 rounded-xl p-4 shadow-lg">
+
+
+<div class="flex justify-between mb-2">
+
+
+<span>
+
+Progress
+
+</span>
+
+
+<span id="progressPercent">
+
+10%
+
+</span>
+
+
+</div>
+
+
+
+<progress
+
+id="progressBar"
+
+class="progress progress-info w-full"
+
+value="10"
+
+max="100">
+
+</progress>
+
+
+</div>
+<!-- CORRECT / WRONG -->
+
+
+<div class="grid grid-cols-2 gap-3">
+
+
+<div class="bg-green-900/30 border border-green-600 rounded-xl p-4">
+
+
+<p class="text-sm text-gray-300">
+
+✔ Correct
+
+</p>
+
+
+<h2 id="correctCount"
+class="text-3xl font-bold text-green-400">
+
+0
+
+</h2>
+
+
+</div>
+
+
+
+
+
+<div class="bg-red-900/30 border border-red-600 rounded-xl p-4">
+
+
+<p class="text-sm text-gray-300">
+
+✖ Wrong
+
+</p>
+
+
+<h2 id="wrongCount"
+class="text-3xl font-bold text-red-400">
+
+0
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- NEXT BUTTON -->
+
+
+<button 
+id="skipBtn"
+class="btn btn-warning btn-block text-lg mt-3">
+
+⏭ Skip Question (-1 ❤️)
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<!-- ================= RULES MODAL ================= -->
+
+
+<dialog id="rulesModal"
+class="modal">
+
+
+<div class="modal-box bg-card text-white">
+
+
+<h3 class="text-3xl font-bold text-accent">
+
+📖 Game Rules
+
+</h3>
+
+
+
+<div class="divider"></div>
+
+
+
+<ul class="space-y-3">
+
+
+<li>
+
+✅ Read the question carefully.
+
+</li>
+
+
+<li>
+
+✅ Click the correct picture.
+
+</li>
+
+
+<li>
+
+✅ Correct answer gives <b>10 points</b>.
+
+</li>
+
+
+<li>
+
+❌ Wrong answer removes <b>1 life</b>.
+
+</li>
+
+
+<li>
+
+⏱ You have <b>30 seconds</b> for each question.
+
+</li>
+
+
+<li>
+
+🏆 Complete all 10 questions.
+
+</li>
+
+
+</ul>
+
+
+
+
+
+<div class="modal-action">
+
+
+<form method="dialog">
+
+
+<button class="btn btn-info">
+
+Close
+
+</button>
+
+
+</form>
+
+
+</div>
+
+
+</div>
+
+
+</dialog>
+
+
+
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+
+<script src="guess.js"></script>
+
+
+
+</body>
+
+</html>
